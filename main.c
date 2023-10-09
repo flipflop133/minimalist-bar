@@ -83,15 +83,17 @@ void* launchModules(void*) {
       pthread_create(&threads[i], NULL, modules[i].thread_function, NULL);
     }
   }
-  // Wait for i3 thread
-  pthread_join(i3_thread, NULL);
-
   // Wait for modules threads
   for (size_t i = 0; i < sizeof(modules) / sizeof(modules[0]); ++i) {
     if (modules[i].enabled) {
       pthread_join(threads[i], NULL);
     }
   }
+  
+  // Wait for i3 thread
+  pthread_join(i3_thread, NULL);
+
+  
   return NULL;
 }
 

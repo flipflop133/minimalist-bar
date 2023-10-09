@@ -4,3 +4,4 @@
 - [ ] read default battery from config file
 - [ ] support custom padding
 - [ ] add tray support
+- [ ] add a xwindow module (to display windows name on the left)

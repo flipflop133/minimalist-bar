@@ -152,7 +152,8 @@ int modules_left_x = 0;
 int modules_left_width = 0;
 void display_modules(int position) {
   printf("\ndipslay_modules\n");
-  pthread_mutex_trylock(&mutex);
+  pthread_mutex_lock(&mutex);
+  printf("\ndipslay_modules accessed\n");
   if (display == NULL || font == NULL || xftDraw == NULL) {
     return;
   }
@@ -174,7 +175,6 @@ void display_modules(int position) {
     xCoordinate_center = DisplayWidth(display, screen_num) / 2;
     break;
   case RIGHT:
-    printf("modules_right_x: %d\n", modules_right_x);
     clearModuleArea(modules_right_x, 0, DisplayWidth(display, screen_num));
     xCoordinate_right = DisplayWidth(display, screen_num) - right_padding;
     break;
@@ -188,15 +188,7 @@ void display_modules(int position) {
 
   while (i < (int)(sizeof(displayOrder) / sizeof(int)) &&
          displayOrder[i] != -1) {
-    printf("num: %d\n", displayOrder[i]);
-    i++;
-  }
-  i = 0;
-  while (i < (int)(sizeof(displayOrder) / sizeof(int)) &&
-         displayOrder[i] != -1) {
-
     ModuleInfo module = modules[displayOrder[i]];
-    printf("module: %s\n", module.name);
     if (module.enabled && module.string != NULL &&
         module.position == position) {
       XftTextExtentsUtf8(display, font, (XftChar8 *)module.string,
@@ -212,7 +204,7 @@ void display_modules(int position) {
         modules_center_width += extents.xOff;
         break;
       case RIGHT:
-        
+        printf("printing right modules\n");
         xCoordinate_right -= extents.xOff;
         drawModuleString(xCoordinate_right, yCoordinate, module.string);
         xCoordinate_right -= padding;
@@ -237,6 +229,8 @@ void clearModuleArea(int x, int y, int width) {
   }
 }
 void drawModuleString(int x, int y, char *string) {
+  printf("displaying string: %s\n", string);
   XftDrawStringUtf8(xftDraw, &xftColor, font, x, y,
                     (const unsigned char *)string, strlen(string));
+  printf("done displaying\n");
 }
