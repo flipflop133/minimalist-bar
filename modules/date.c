@@ -8,7 +8,7 @@ void *date_update(void *) {
   int first_iteration = 1;
 
   while (running) {
-    pthread_mutex_trylock(&mutex);
+    pthread_mutex_lock(&mutex);
     modules[date].string = (char *)malloc((DATE_BUFFER + 1 * sizeof(char)));
     modules[date].string[0] = '\0';
     pthread_mutex_unlock(&mutex);

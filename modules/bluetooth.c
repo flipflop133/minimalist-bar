@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include "../display.h"
 void *bluetooth_update(void*) {
-  pthread_mutex_trylock(&mutex);
+  pthread_mutex_lock(&mutex);
   modules[bluetooth].string = (char *)malloc((BLUETOOTH_BUFFER * sizeof(char)));
   modules[bluetooth].string[0] = '\0';
   pthread_mutex_unlock(&mutex);

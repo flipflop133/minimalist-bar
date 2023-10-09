@@ -19,6 +19,10 @@ int remove_nl(char *str);
 void cleanup(int sig);
 extern int running;
 extern pthread_mutex_t mutex;
-extern int displayOrder[7];
+typedef struct {
+  int *list;
+  int size;
+} DisplayOrder;
+extern DisplayOrder displayOrder;
 extern void* launchModules(void*);
 #endif

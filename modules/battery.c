@@ -31,7 +31,7 @@ bat_status batList[] = {
 };
 
 void *battery_update(void *) {
-  pthread_mutex_trylock(&mutex);
+  pthread_mutex_lock(&mutex);
   modules[battery].string = (char *)malloc((BATTERY_BUFFER * sizeof(char)));
   modules[battery].string[0] = '\0';
   pthread_mutex_unlock(&mutex);

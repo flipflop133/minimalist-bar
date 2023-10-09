@@ -48,7 +48,7 @@ ModuleInfo modules[] = {{.name = "date",
                          .string = NULL,
                          .interval = 5}};
 
-int displayOrder[7] = {-1, -1, -1, -1, -1, -1, -1};
+DisplayOrder displayOrder;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -71,7 +71,7 @@ int main() {
   return 0;
 }
 
-void* launchModules(void*) {
+void *launchModules(void *) {
   // Start i3 thread
   pthread_t i3_thread;
   pthread_create(&i3_thread, NULL, listen_to_i3, NULL);
@@ -89,11 +89,10 @@ void* launchModules(void*) {
       pthread_join(threads[i], NULL);
     }
   }
-  
+
   // Wait for i3 thread
   pthread_join(i3_thread, NULL);
 
-  
   return NULL;
 }
 
@@ -130,20 +129,41 @@ static void parse_config(void) {
   const cJSON *modules_json = cJSON_GetObjectItemCaseSensitive(json, "modules");
   cJSON *current = modules_json->child;
   int c = 0;
+  int number_of_modules = 0;
+  cJSON *tmp = current;
+  while (tmp != NULL) {
+    tmp = tmp->next;
+    number_of_modules++;
+  }
+  displayOrder.list = (int *)malloc(sizeof(int) * number_of_modules);
+
   // Set modules values from config file
   while (current != NULL) {
+    int found = 0;
     for (int i = 0; i < (int)(sizeof(modules) / sizeof(modules[0])); ++i) {
       if (strcmp(modules[i].name, current->string) == 0) {
         modules[i].enabled = 1;
-        displayOrder[c] = i;
+        displayOrder.list[c] = i;
+        found = 1;
         break;
       }
+    }
+    if (!found) {
+      fprintf(stderr, "Error in config file, module %s doesn't exist!\n",
+              current->string);
+      exit(1);
     }
 
     c++;
     current = current->next;
   }
-
+  displayOrder.size = c;
+  int i = 0;
+  while (i < displayOrder.size) {
+    ModuleInfo module = modules[displayOrder.list[i]];
+    printf("Module : %s\n", module.name);
+    i++;
+  }
   cJSON_Delete(json);
 }
 

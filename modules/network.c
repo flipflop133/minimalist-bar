@@ -59,7 +59,7 @@ static char *convert_signal_to_icon(int signal) {
 }
 
 void *wifi_update(void *) {
-  pthread_mutex_trylock(&mutex);
+  pthread_mutex_lock(&mutex);
   modules[network].string = (char *)malloc((NETWORK_BUFFER * sizeof(char)));
   modules[network].string[0] = '\0';
   pthread_mutex_unlock(&mutex);

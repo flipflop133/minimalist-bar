@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include "../display.h"
 void *media_update(void *) {
-  pthread_mutex_trylock(&mutex);
+  pthread_mutex_lock(&mutex);
   modules[media].string = (char *)malloc((MEDIA_BUFFER+1 * sizeof(char)));
   modules[media].string[0] = '\0';
   pthread_mutex_unlock(&mutex);

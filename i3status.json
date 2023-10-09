@@ -1,6 +1,8 @@
 {
     "modules": {
         "date":{},
+        "battery":{},
+        "network":{},
         "volume":{},
         "mic":{},
         "media":{}

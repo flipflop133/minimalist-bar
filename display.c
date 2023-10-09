@@ -67,14 +67,12 @@ void *display_graphic_bar(void *) {
   font = XftFontOpen(display, DefaultScreen(display), XFT_FAMILY, XftTypeString,
                      "JetBrainsMonoNerdFontMono", XFT_SIZE, XftTypeDouble, 14.0,
                      (void *)0);
+  // font = XftFontOpenName(display, DefaultScreen(display),
+  //                        "JetBrainsMono Nerd Font Mono:size=14");
 
-  Visual *visual = DefaultVisual(display, screen_num);
-
-  Colormap colormap =
-      XCreateColormap(display, DefaultRootWindow(display), visual, AllocNone);
-  xftDraw =
-      XftDrawCreate(display, window,
-                    DefaultVisual(display, DefaultScreen(display)), colormap);
+  xftDraw = XftDrawCreate(display, window,
+                          DefaultVisual(display, DefaultScreen(display)),
+                          DefaultColormap(display, DefaultScreen(display)));
   XftColorAllocName(display, DefaultVisual(display, DefaultScreen(display)),
                     DefaultColormap(display, DefaultScreen(display)), "#ffffff",
                     &xftColor);
@@ -153,7 +151,7 @@ int modules_left_width = 0;
 void display_modules(int position) {
   printf("\ndipslay_modules\n");
   pthread_mutex_lock(&mutex);
-  printf("\ndipslay_modules accessed\n");
+  printf("dipslay_modules accessed\n");
   if (display == NULL || font == NULL || xftDraw == NULL) {
     return;
   }
@@ -186,13 +184,16 @@ void display_modules(int position) {
   int i = 0;
   XGlyphInfo extents;
 
-  while (i < (int)(sizeof(displayOrder) / sizeof(int)) &&
-         displayOrder[i] != -1) {
-    ModuleInfo module = modules[displayOrder[i]];
+  while (i < displayOrder.size) {
+    ModuleInfo module = modules[displayOrder.list[i]];
+    printf("trying module: %s\n", module.name);
     if (module.enabled && module.string != NULL &&
         module.position == position) {
+      printf("displaying module: %s\n", module.name);
+      printf("displaying module string: %s\n", module.string);
       XftTextExtentsUtf8(display, font, (XftChar8 *)module.string,
                          strlen(module.string), &extents);
+      printf("extends ok\n");
       switch (module.position) {
       case LEFT:
         xCoordinate_left = xCoordinate_left + padding;
@@ -204,9 +205,10 @@ void display_modules(int position) {
         modules_center_width += extents.xOff;
         break;
       case RIGHT:
-        printf("printing right modules\n");
         xCoordinate_right -= extents.xOff;
+
         drawModuleString(xCoordinate_right, yCoordinate, module.string);
+
         xCoordinate_right -= padding;
         break;
       default:
