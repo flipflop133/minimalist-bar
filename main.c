@@ -49,7 +49,7 @@ ModuleInfo modules[] = {{.name = "date",
                          .interval = 5}};
 
 DisplayOrder displayOrder;
-
+Options options;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 int running = 1;
@@ -57,6 +57,7 @@ int running = 1;
 int main() {
   // Parse config file
   parse_config();
+  printf("parsing done\n");
 
   signal(SIGTERM, cleanup);
   signal(SIGINT, cleanup);
@@ -126,11 +127,11 @@ static void parse_config(void) {
 
   // Parse json from config file
   cJSON *json = cJSON_Parse(config);
-  const cJSON *modules_json = cJSON_GetObjectItemCaseSensitive(json, "modules");
-  cJSON *current = modules_json->child;
+  cJSON *modules_json =
+      cJSON_GetObjectItemCaseSensitive(json, "modules")->child;
   int c = 0;
   int number_of_modules = 0;
-  cJSON *tmp = current;
+  cJSON *tmp = modules_json;
   while (tmp != NULL) {
     tmp = tmp->next;
     number_of_modules++;
@@ -138,10 +139,10 @@ static void parse_config(void) {
   displayOrder.list = (int *)malloc(sizeof(int) * number_of_modules);
 
   // Set modules values from config file
-  while (current != NULL) {
+  while (modules_json != NULL) {
     int found = 0;
     for (int i = 0; i < (int)(sizeof(modules) / sizeof(modules[0])); ++i) {
-      if (strcmp(modules[i].name, current->string) == 0) {
+      if (strcmp(modules[i].name, modules_json->string) == 0) {
         modules[i].enabled = 1;
         displayOrder.list[c] = i;
         found = 1;
@@ -150,20 +151,36 @@ static void parse_config(void) {
     }
     if (!found) {
       fprintf(stderr, "Error in config file, module %s doesn't exist!\n",
-              current->string);
+              modules_json->string);
       exit(1);
     }
 
     c++;
-    current = current->next;
+    modules_json = modules_json->next;
   }
   displayOrder.size = c;
-  int i = 0;
-  while (i < displayOrder.size) {
-    ModuleInfo module = modules[displayOrder.list[i]];
-    printf("Module : %s\n", module.name);
-    i++;
-  }
+
+  // Parse config options
+  cJSON *options_json = cJSON_GetObjectItemCaseSensitive(json, "general");
+  options.background_color =
+      cJSON_GetObjectItemCaseSensitive(options_json, "background-color")
+          ->valuestring;
+  printf("%s\n", options.background_color);
+  printf("ok\n");
+  options.foreground_color =
+      cJSON_GetObjectItemCaseSensitive(options_json, "foreground-color")
+          ->valuestring;
+
+  
+  options.right_padding =
+      cJSON_GetObjectItemCaseSensitive(options_json, "right-padding")->valueint;
+  options.module_left_padding =
+      cJSON_GetObjectItemCaseSensitive(options_json, "module-left-padding")
+          ->valueint;
+  options.font_name =
+      cJSON_GetObjectItemCaseSensitive(options_json, "font-name")->valuestring;
+  options.font_size =
+      cJSON_GetObjectItemCaseSensitive(options_json, "font-size")->valueint;
   cJSON_Delete(json);
 }
 

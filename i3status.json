@@ -6,5 +6,13 @@
         "volume":{},
         "mic":{},
         "media":{}
+    },
+    "general": {
+        "background-color": "#333333",
+        "foreground-color": "#bbbbbb",
+        "right-padding": 10,
+        "module-left-padding": 30,
+        "font-name": "JetBrainsMono Nerd Font",
+        "font-size": 12
     }
 }

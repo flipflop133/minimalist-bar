@@ -5,12 +5,17 @@
 #include <X11/Xft/Xft.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <cairo/cairo-ft.h>
+#include <cairo/cairo-xlib.h>
+#include <cairo/cairo.h>
+#include <ft2build.h>
 #include <i3/ipc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include FT_FREETYPE_H
 Display *display;
 int screen_num;
 GC gc;
@@ -37,7 +42,8 @@ void *display_graphic_bar(void *) {
     exit(1);
   }
 
-  unsigned long background_color = hex_color_to_pixel("#333333", screen_num);
+  printf("background color: %s\n", options.background_color);
+  unsigned long background_color = hex_color_to_pixel(options.background_color, screen_num);
 
   Window root_window = RootWindow(display, screen_num);
   int bar_height = 40;
@@ -65,7 +71,7 @@ void *display_graphic_bar(void *) {
   gc = XCreateGC(display, window, 0, NULL);
 
   font = XftFontOpen(display, DefaultScreen(display), XFT_FAMILY, XftTypeString,
-                     "JetBrainsMonoNerdFontMono", XFT_SIZE, XftTypeDouble, 14.0,
+                     "JetBrainsMono Nerd Font", XFT_SIZE, XftTypeDouble, 12.0,
                      (void *)0);
   // font = XftFontOpenName(display, DefaultScreen(display),
   //                        "JetBrainsMono Nerd Font Mono:size=14");
@@ -74,7 +80,7 @@ void *display_graphic_bar(void *) {
                           DefaultVisual(display, DefaultScreen(display)),
                           DefaultColormap(display, DefaultScreen(display)));
   XftColorAllocName(display, DefaultVisual(display, DefaultScreen(display)),
-                    DefaultColormap(display, DefaultScreen(display)), "#ffffff",
+                    DefaultColormap(display, DefaultScreen(display)),options.foreground_color,
                     &xftColor);
 
   // Start modules thread
@@ -149,9 +155,7 @@ int modules_center_width = 0;
 int modules_left_x = 0;
 int modules_left_width = 0;
 void display_modules(int position) {
-  printf("\ndipslay_modules\n");
   pthread_mutex_lock(&mutex);
-  printf("dipslay_modules accessed\n");
   if (display == NULL || font == NULL || xftDraw == NULL) {
     return;
   }
@@ -159,7 +163,7 @@ void display_modules(int position) {
   int xCoordinate_left = modules_left_x;
   int xCoordinate_center = modules_center_x;
   int yCoordinate = 30;
-  int padding = 20; // TODO: put this in a config file
+  int padding = 30; // TODO: put this in a config file
   int xCoordinate_right = modules_right_x;
   // Clear modules area
   switch (position) {
@@ -186,14 +190,10 @@ void display_modules(int position) {
 
   while (i < displayOrder.size) {
     ModuleInfo module = modules[displayOrder.list[i]];
-    printf("trying module: %s\n", module.name);
     if (module.enabled && module.string != NULL &&
         module.position == position) {
-      printf("displaying module: %s\n", module.name);
-      printf("displaying module string: %s\n", module.string);
       XftTextExtentsUtf8(display, font, (XftChar8 *)module.string,
                          strlen(module.string), &extents);
-      printf("extends ok\n");
       switch (module.position) {
       case LEFT:
         xCoordinate_left = xCoordinate_left + padding;
@@ -230,9 +230,8 @@ void clearModuleArea(int x, int y, int width) {
                False);
   }
 }
+
 void drawModuleString(int x, int y, char *string) {
-  printf("displaying string: %s\n", string);
   XftDrawStringUtf8(xftDraw, &xftColor, font, x, y,
-                    (const unsigned char *)string, strlen(string));
-  printf("done displaying\n");
+                    (const FcChar8*)string, strlen(string));
 }
