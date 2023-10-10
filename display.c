@@ -16,6 +16,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include FT_FREETYPE_H
+
+#define BAR_NAME "minimalist_bar"
 Display *display;
 int screen_num;
 GC gc;
@@ -42,17 +44,17 @@ void *display_graphic_bar(void *) {
     exit(1);
   }
 
-  printf("background color: %s\n", options.background_color);
   unsigned long background_color = hex_color_to_pixel(options.background_color, screen_num);
 
   Window root_window = RootWindow(display, screen_num);
-  int bar_height = 40;
-  int y_position = DisplayHeight(display, screen_num) - bar_height;
+  
+  int y_position = strcmp(options.bar_position, "top") ? (DisplayHeight(display, screen_num) - options.bar_height)
+  : 0;
 
   window = XCreateSimpleWindow(display, root_window, 0, y_position,
-                               DisplayWidth(display, screen_num), bar_height, 0,
+                               DisplayWidth(display, screen_num), options.bar_height, 0,
                                0, background_color);
-  XStoreName(display, window, "simple_bar");
+  XStoreName(display, window, BAR_NAME);
   XSelectInput(display, window, ExposureMask | KeyPressMask);
 
   Atom net_wm_window_property =
@@ -71,17 +73,15 @@ void *display_graphic_bar(void *) {
   gc = XCreateGC(display, window, 0, NULL);
 
   font = XftFontOpen(display, DefaultScreen(display), XFT_FAMILY, XftTypeString,
-                     "JetBrainsMono Nerd Font", XFT_SIZE, XftTypeDouble, 12.0,
-                     (void *)0);
-  // font = XftFontOpenName(display, DefaultScreen(display),
-  //                        "JetBrainsMono Nerd Font Mono:size=14");
+                     options.font_name, XFT_SIZE, XftTypeDouble,
+                     (float)options.font_size, (void *)0);
 
   xftDraw = XftDrawCreate(display, window,
                           DefaultVisual(display, DefaultScreen(display)),
                           DefaultColormap(display, DefaultScreen(display)));
   XftColorAllocName(display, DefaultVisual(display, DefaultScreen(display)),
-                    DefaultColormap(display, DefaultScreen(display)),options.foreground_color,
-                    &xftColor);
+                    DefaultColormap(display, DefaultScreen(display)),
+                    options.foreground_color, &xftColor);
 
   // Start modules thread
   pthread_t modules_thread;
@@ -110,9 +110,6 @@ void *display_graphic_bar(void *) {
 int workspaces_width = 0;
 
 void display_workspaces() {
-  if (display == NULL || font == NULL || xftDraw == NULL) {
-    return;
-  }
   int background_color_padding = 10;
   int left_padding = 10; // TODO: put this in a config file
   int xCoordinate = 0 + left_padding;
@@ -130,18 +127,18 @@ void display_workspaces() {
 
     sprintf(str, "%d", workspaces[i].num);
     XftTextExtentsUtf8(display, font, (XftChar8 *)str, strlen(str), &extents);
+
     if (workspaces[i].visible) {
-      XSetForeground(display, gc, hex_color_to_pixel("#15539e", screen_num));
+      printf("drawing rectangle\n");
+      XSetForeground(display, gc,
+                     hex_color_to_pixel(options.workspace_color, screen_num));
       XFillRectangle(display, window, gc,
                      xCoordinate - background_color_padding / 2, 0,
                      extents.xOff + background_color_padding, 40);
-      XftDrawStringUtf8(xftDraw, &xftColor, font, xCoordinate, 30,
-                        (const unsigned char *)str, strlen(str));
-    } else {
-      XftDrawStringUtf8(xftDraw, &xftColor, font, xCoordinate, 30,
-                        (const unsigned char *)str, strlen(str));
+      printf("drawed rectangle\n");
     }
-
+    XftDrawStringUtf8(xftDraw, &xftColor, font, xCoordinate, 30,
+                      (const unsigned char *)str, strlen(str));
     xCoordinate = xCoordinate + extents.xOff + padding;
   }
   workspaces_width = xCoordinate;
@@ -232,6 +229,6 @@ void clearModuleArea(int x, int y, int width) {
 }
 
 void drawModuleString(int x, int y, char *string) {
-  XftDrawStringUtf8(xftDraw, &xftColor, font, x, y,
-                    (const FcChar8*)string, strlen(string));
+  XftDrawStringUtf8(xftDraw, &xftColor, font, x, y, (const FcChar8 *)string,
+                    strlen(string));
 }

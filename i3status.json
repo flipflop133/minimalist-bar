@@ -8,11 +8,14 @@
         "media":{}
     },
     "general": {
-        "background-color": "#333333",
-        "foreground-color": "#bbbbbb",
+        "background-color": "#353535",
+        "foreground-color": "#eeeeec",
+        "workspace-color": "#15539e",
         "right-padding": 10,
         "module-left-padding": 30,
         "font-name": "JetBrainsMono Nerd Font",
-        "font-size": 12
+        "font-size": 12,
+        "bar-position": "bottom",
+        "bar-height": 40
     }
 }
