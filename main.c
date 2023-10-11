@@ -162,32 +162,38 @@ static void parse_config(void) {
 
   // Parse config options
   cJSON *options_json = cJSON_GetObjectItemCaseSensitive(json, "general");
+  // Colors
   strcpy(options.background_color,
          (cJSON_GetObjectItemCaseSensitive(options_json, "background-color")
               ->valuestring));
-  
   strcpy(options.foreground_color,
          (cJSON_GetObjectItemCaseSensitive(options_json, "foreground-color")
               ->valuestring));
   strcpy(options.workspace_color,
          (cJSON_GetObjectItemCaseSensitive(options_json, "workspace-color")
               ->valuestring));
-  strcpy(options.bar_position,
-         (cJSON_GetObjectItemCaseSensitive(options_json, "bar-position")
-              ->valuestring));
-  options.right_padding =
-      cJSON_GetObjectItemCaseSensitive(options_json, "right-padding")->valueint;
-  options.module_left_padding =
-      cJSON_GetObjectItemCaseSensitive(options_json, "module-left-padding")
-          ->valueint;
+  // Font
   char *font_name =
       cJSON_GetObjectItemCaseSensitive(options_json, "font-name")->valuestring;
   options.font_name = malloc(sizeof(char) * strlen(font_name));
   strcpy(options.font_name, font_name);
   options.font_size =
       cJSON_GetObjectItemCaseSensitive(options_json, "font-size")->valueint;
+  // Sizes
+  options.right_padding =
+      cJSON_GetObjectItemCaseSensitive(options_json, "right-padding")->valueint;
+  options.module_left_padding =
+      cJSON_GetObjectItemCaseSensitive(options_json, "module-left-padding")
+          ->valueint;
   options.bar_height =
       cJSON_GetObjectItemCaseSensitive(options_json, "bar-height")->valueint;
+  options.workspace_padding =
+      cJSON_GetObjectItemCaseSensitive(options_json, "workspace-padding")
+          ->valueint;
+  // Other
+  strcpy(options.bar_position,
+         (cJSON_GetObjectItemCaseSensitive(options_json, "bar-position")
+              ->valuestring));
   cJSON_Delete(json);
 }
 

@@ -25,7 +25,7 @@ Window window;
 XftFont *font;
 XftDraw *xftDraw;
 XftColor xftColor;
-
+int yFontCoordinate;
 void drawModuleString(int x, int y, char *string);
 void clearModuleArea(int x, int y, int width);
 unsigned long hex_color_to_pixel(char *hex_color, int screen_num) {
@@ -82,7 +82,7 @@ void *display_graphic_bar(void *) {
   XftColorAllocName(display, DefaultVisual(display, DefaultScreen(display)),
                     DefaultColormap(display, DefaultScreen(display)),
                     options.foreground_color, &xftColor);
-
+  yFontCoordinate = (options.bar_height + font->ascent - font->descent) / 2;
   // Start modules thread
   pthread_t modules_thread;
   pthread_create(&modules_thread, NULL, launchModules, NULL);
@@ -108,13 +108,10 @@ void *display_graphic_bar(void *) {
 }
 
 int workspaces_width = 0;
-
 void display_workspaces() {
-  int background_color_padding = 10;
-  int left_padding = 10; // TODO: put this in a config file
-  int xCoordinate = 0 + left_padding;
+  int workspace_padding = options.workspace_padding;
   int padding = 20;
-
+  int xCoordinate = workspace_padding / 2;
   XGlyphInfo extents;
   XClearArea(display, window, 0, 0, workspaces_width,
              DisplayHeight(display, screen_num), False);
@@ -129,15 +126,13 @@ void display_workspaces() {
     XftTextExtentsUtf8(display, font, (XftChar8 *)str, strlen(str), &extents);
 
     if (workspaces[i].visible) {
-      printf("drawing rectangle\n");
       XSetForeground(display, gc,
                      hex_color_to_pixel(options.workspace_color, screen_num));
       XFillRectangle(display, window, gc,
-                     xCoordinate - background_color_padding / 2, 0,
-                     extents.xOff + background_color_padding, 40);
-      printf("drawed rectangle\n");
+                     xCoordinate - workspace_padding / 2, 0,
+                     extents.xOff + workspace_padding, options.bar_height);
     }
-    XftDrawStringUtf8(xftDraw, &xftColor, font, xCoordinate, 30,
+    XftDrawStringUtf8(xftDraw, &xftColor, font, xCoordinate, yFontCoordinate,
                       (const unsigned char *)str, strlen(str));
     xCoordinate = xCoordinate + extents.xOff + padding;
   }
@@ -159,7 +154,6 @@ void display_modules(int position) {
 
   int xCoordinate_left = modules_left_x;
   int xCoordinate_center = modules_center_x;
-  int yCoordinate = 30;
   int padding = 30; // TODO: put this in a config file
   int xCoordinate_right = modules_right_x;
   // Clear modules area
@@ -194,18 +188,17 @@ void display_modules(int position) {
       switch (module.position) {
       case LEFT:
         xCoordinate_left = xCoordinate_left + padding;
-        drawModuleString(xCoordinate_left, yCoordinate, module.string);
+        drawModuleString(xCoordinate_left, yFontCoordinate, module.string);
         break;
       case CENTER:
         xCoordinate_center -= extents.xOff / 2;
-        drawModuleString(xCoordinate_center, yCoordinate, module.string);
+        drawModuleString(xCoordinate_center, yFontCoordinate, module.string);
         modules_center_width += extents.xOff;
         break;
       case RIGHT:
+      
         xCoordinate_right -= extents.xOff;
-
-        drawModuleString(xCoordinate_right, yCoordinate, module.string);
-
+        drawModuleString(xCoordinate_right, yFontCoordinate, module.string);
         xCoordinate_right -= padding;
         break;
       default:

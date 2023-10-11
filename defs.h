@@ -15,14 +15,22 @@ extern ModuleInfo modules[];
 
 typedef struct
 {
+  // Colors
   char background_color[8];
   char foreground_color[8];
   char workspace_color[8];
-  int right_padding;
-  int module_left_padding;
+
+  // Font
   char* font_name;
   int font_size;
+
+  // Sizes
+  int workspace_padding;
+  int right_padding;
+  int module_left_padding;
   int bar_height;
+
+  // Other
   char bar_position[7];
 } Options;
 extern Options options;
