@@ -57,7 +57,6 @@ int running = 1;
 int main() {
   // Parse config file
   parse_config();
-  printf("parsing done\n");
 
   signal(SIGTERM, cleanup);
   signal(SIGINT, cleanup);

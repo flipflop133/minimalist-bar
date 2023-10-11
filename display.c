@@ -116,16 +116,16 @@ void display_workspaces() {
   XClearArea(display, window, 0, 0, workspaces_width,
              DisplayHeight(display, screen_num), False);
 
-  for (int i = 0; i < (int)(sizeof(workspaces) / sizeof(workspaces[0])); i++) {
-    if (workspaces[i].num == 0) {
+  for (unsigned short i = 0; i < workspaces.size; i++) {
+    if (workspaces.workspaces[i].num == 0) {
       break;
     }
-    char str[workspaces[i].num];
+    char str[workspaces.workspaces[i].num];
 
-    sprintf(str, "%d", workspaces[i].num);
+    sprintf(str, "%d", workspaces.workspaces[i].num);
     XftTextExtentsUtf8(display, font, (XftChar8 *)str, strlen(str), &extents);
 
-    if (workspaces[i].visible) {
+    if (workspaces.workspaces[i].visible) {
       XSetForeground(display, gc,
                      hex_color_to_pixel(options.workspace_color, screen_num));
       XFillRectangle(display, window, gc,
@@ -154,7 +154,6 @@ void display_modules(int position) {
 
   int xCoordinate_left = modules_left_x;
   int xCoordinate_center = modules_center_x;
-  int padding = 30; // TODO: put this in a config file
   int xCoordinate_right = modules_right_x;
   // Clear modules area
   switch (position) {
@@ -187,7 +186,7 @@ void display_modules(int position) {
                          strlen(module.string), &extents);
       switch (module.position) {
       case LEFT:
-        xCoordinate_left = xCoordinate_left + padding;
+        xCoordinate_left = xCoordinate_left + options.module_left_padding;
         drawModuleString(xCoordinate_left, yFontCoordinate, module.string);
         break;
       case CENTER:
@@ -199,7 +198,7 @@ void display_modules(int position) {
       
         xCoordinate_right -= extents.xOff;
         drawModuleString(xCoordinate_right, yFontCoordinate, module.string);
-        xCoordinate_right -= padding;
+        xCoordinate_right -= options.module_left_padding;
         break;
       default:
         break;

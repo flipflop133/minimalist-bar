@@ -4,6 +4,10 @@ extern void* listen_to_i3(void*);
 typedef struct {
   int num;
   int visible;
+} Workspace;
+typedef struct {
+  Workspace * workspaces;
+  unsigned short size;
 } Workspaces;
-extern Workspaces workspaces[20];
+extern Workspaces workspaces;
 #endif

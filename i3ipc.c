@@ -12,9 +12,8 @@
 #include <unistd.h>
 
 static void parse_i3_workspaces(char *config);
-static void clean_workspaces_list(void);
 
-Workspaces workspaces[20]; // TODO don't use hardcore max number of workspaces
+Workspaces workspaces; // TODO don't use hardcore max number of workspaces
 
 void retrieve_i3_socket_path(char *path) {
   FILE *fp = popen("i3 --get-socketpath", "r");
@@ -94,25 +93,29 @@ void *listen_to_i3(void *) {
   return 0;
 }
 
-static void clean_workspaces_list(void) {
-  for (int i = 0; i < 20; i++) {
-    workspaces[i].num = 0;
-    workspaces[i].visible = 0;
-  }
-}
-
 static void parse_i3_workspaces(char *config) {
-  clean_workspaces_list();
+  // Clean workspaces list
+  free(workspaces.workspaces);
+  workspaces.size = 0;
+
   // Parse json from config file
   cJSON *json = cJSON_Parse(config);
   cJSON *workspace = NULL;
-  int i = 0;
+  unsigned short i = 0;
+  unsigned short  workspaces_number = 10;
+  
+  workspaces.workspaces = malloc(workspaces_number * sizeof(Workspaces));
   cJSON_ArrayForEach(workspace, json) {
     cJSON *num = cJSON_GetObjectItemCaseSensitive(workspace, "num");
     cJSON *visible = cJSON_GetObjectItemCaseSensitive(workspace, "visible");
-    workspaces[i].num = num->valueint;
-    workspaces[i].visible = visible->valueint;
+    workspaces.workspaces[i].num = num->valueint;
+    workspaces.workspaces[i].visible = visible->valueint;
     i++;
+    if(i > workspaces_number){
+      workspaces_number += 10;
+      workspaces.workspaces = realloc(workspaces.workspaces, workspaces_number * sizeof(Workspaces));
+    }
   }
+  workspaces.size = i;
   cJSON_Delete(json);
 }

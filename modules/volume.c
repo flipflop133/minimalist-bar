@@ -84,9 +84,7 @@ static void sink_info_callback(pa_context *, const pa_sink_info *i, int,
         sprintf(modules[volume].string, "󰕿 %.f%%", vol);
       }
     }
-    printf("calling display modules from sink\n");
     display_modules(modules[volume].position);
-    printf("done calling display modules from sink\n");
   }
 }
 
@@ -104,9 +102,7 @@ static void source_info_callback(pa_context *, const pa_source_info *i,
 }
 
 void *volume_update(void *) {
-  printf("locking volume mutex\n");
   pthread_mutex_lock(&mutex);
-  printf("unlocking volume mutex\n");
   modules[volume].string = (char *)malloc((VOLUME_BUFFER * sizeof(char)));
   modules[volume].string[0] = '\0';
   pthread_mutex_unlock(&mutex);

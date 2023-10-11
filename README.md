@@ -14,3 +14,4 @@
 - [ ] support custom modules
 - [ ] add tray support
 - [ ] support hover and clicks?
+- [ ] handle text overflow of modules (carousel system?)
