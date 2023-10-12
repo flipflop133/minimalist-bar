@@ -44,16 +44,19 @@ void *display_graphic_bar(void *) {
     exit(1);
   }
 
-  unsigned long background_color = hex_color_to_pixel(options.background_color, screen_num);
+  unsigned long background_color =
+      hex_color_to_pixel(options.background_color, screen_num);
 
   Window root_window = RootWindow(display, screen_num);
-  
-  int y_position = strcmp(options.bar_position, "top") ? (DisplayHeight(display, screen_num) - options.bar_height)
-  : 0;
+
+  int y_position =
+      strcmp(options.bar_position, "top")
+          ? (DisplayHeight(display, screen_num) - options.bar_height)
+          : 0;
 
   window = XCreateSimpleWindow(display, root_window, 0, y_position,
-                               DisplayWidth(display, screen_num), options.bar_height, 0,
-                               0, background_color);
+                               DisplayWidth(display, screen_num),
+                               options.bar_height, 0, 0, background_color);
   XStoreName(display, window, BAR_NAME);
   XSelectInput(display, window, ExposureMask | KeyPressMask);
 
@@ -125,12 +128,13 @@ void display_workspaces() {
     sprintf(str, "%d", workspaces.workspaces[i].num);
     XftTextExtentsUtf8(display, font, (XftChar8 *)str, strlen(str), &extents);
 
-    if (workspaces.workspaces[i].visible) {
-      XSetForeground(display, gc,
-                     hex_color_to_pixel(options.workspace_color, screen_num));
-      XFillRectangle(display, window, gc,
-                     xCoordinate - workspace_padding / 2, 0,
-                     extents.xOff + workspace_padding, options.bar_height);
+    if (workspaces.workspaces[i].urgent || workspaces.workspaces[i].visible) {
+      char *color = workspaces.workspaces[i].urgent
+                        ? options.workspace_color_urgent
+                        : options.workspace_color;
+      XSetForeground(display, gc, hex_color_to_pixel(color, screen_num));
+      XFillRectangle(display, window, gc, xCoordinate - workspace_padding / 2,
+                     0, extents.xOff + workspace_padding, options.bar_height);
     }
     XftDrawStringUtf8(xftDraw, &xftColor, font, xCoordinate, yFontCoordinate,
                       (const unsigned char *)str, strlen(str));
@@ -195,7 +199,7 @@ void display_modules(int position) {
         modules_center_width += extents.xOff;
         break;
       case RIGHT:
-      
+
         xCoordinate_right -= extents.xOff;
         drawModuleString(xCoordinate_right, yFontCoordinate, module.string);
         xCoordinate_right -= options.module_left_padding;

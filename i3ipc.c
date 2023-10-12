@@ -108,8 +108,10 @@ static void parse_i3_workspaces(char *config) {
   cJSON_ArrayForEach(workspace, json) {
     cJSON *num = cJSON_GetObjectItemCaseSensitive(workspace, "num");
     cJSON *visible = cJSON_GetObjectItemCaseSensitive(workspace, "visible");
+    cJSON *urgent = cJSON_GetObjectItemCaseSensitive(workspace, "urgent");
     workspaces.workspaces[i].num = num->valueint;
     workspaces.workspaces[i].visible = visible->valueint;
+    workspaces.workspaces[i].urgent = urgent->valueint;
     i++;
     if(i > workspaces_number){
       workspaces_number += 10;

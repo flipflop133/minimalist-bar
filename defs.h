@@ -19,6 +19,7 @@ typedef struct
   char background_color[8];
   char foreground_color[8];
   char workspace_color[8];
+  char workspace_color_urgent[8];
 
   // Font
   char* font_name;

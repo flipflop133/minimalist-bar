@@ -171,6 +171,9 @@ static void parse_config(void) {
   strcpy(options.workspace_color,
          (cJSON_GetObjectItemCaseSensitive(options_json, "workspace-color")
               ->valuestring));
+  strcpy(options.workspace_color_urgent,
+         (cJSON_GetObjectItemCaseSensitive(options_json, "workspace-color-urgent")
+              ->valuestring));
   // Font
   char *font_name =
       cJSON_GetObjectItemCaseSensitive(options_json, "font-name")->valuestring;
