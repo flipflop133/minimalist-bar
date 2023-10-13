@@ -1,5 +1,6 @@
 #include "bluetooth.h"
 #include "../defs.h"
+#include "../display.h"
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
@@ -8,8 +9,7 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include "../display.h"
-void *bluetooth_update(void*) {
+void *bluetooth_update(void *) {
   pthread_mutex_lock(&mutex);
   modules[bluetooth].string = (char *)malloc((BLUETOOTH_BUFFER * sizeof(char)));
   modules[bluetooth].string[0] = '\0';
@@ -17,7 +17,7 @@ void *bluetooth_update(void*) {
   int dev_id = hci_get_route(NULL);
   int sock = hci_open_dev(dev_id);
   struct hci_version ver;
-  
+
   while (running) {
     if (hci_read_local_version(sock, &ver, 0) < 0) {
       strcpy(modules[bluetooth].string, "󰂲");
@@ -35,7 +35,7 @@ void *bluetooth_update(void*) {
         for (int i = 0; i < cl->conn_num; i++) {
           ci = &cl->conn_info[i];
           ba2str(&ci->bdaddr, remote_device_address);
-          char* name = (char*)malloc(30*sizeof(char));
+          char *name = (char *)malloc(30 * sizeof(char));
           hci_read_remote_name(sock, &ci->bdaddr, sizeof(name), name, 0);
           sprintf(modules[bluetooth].string, "󰂱 %s", name);
           free(name);
@@ -47,6 +47,7 @@ void *bluetooth_update(void*) {
     }
     sleep(1);
   }
+  display_modules(modules[bluetooth].position);
   close(sock);
   free(modules[bluetooth].string);
   return 0;

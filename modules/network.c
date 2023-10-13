@@ -16,7 +16,7 @@ static void retrieve_initial_status(void);
 static char *convert_signal_to_icon(int signal);
 int wifi_signal = 1; // TODO : read this value from config file
 
-#define DEFAULT_INTERFACE "wlan0"
+#define DEFAULT_INTERFACE "wlan0" // TODO : read this value from config file
 
 static void execute_ioctl_command(int command, char *result) {
   struct iwreq wreq;

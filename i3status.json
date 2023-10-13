@@ -1,17 +1,20 @@
 {
     "modules": {
-        "date":{},
-        "battery":{},
-        "network":{},
-        "volume":{},
-        "mic":{},
-        "media":{}
+        "date": {},
+        "battery": {},
+        "network": {
+            "interface": "wlan0"
+        },
+        "bluetooth": {},
+        "volume": {},
+        "mic": {},
+        "media": {}
     },
     "general": {
         "background-color": "#353535",
         "foreground-color": "#eeeeec",
         "workspace-color": "#15539e",
-        "workspace-color-urgent": "#ff0000",
+        "workspace-color-urgent": "#c01c28",
         "workspace-padding": 20,
         "right-padding": 10,
         "module-left-padding": 30,

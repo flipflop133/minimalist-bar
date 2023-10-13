@@ -1,9 +1,9 @@
+#include "volume.h"
 #include "../defs.h"
+#include "../display.h"
 #include <pulse/pulseaudio.h>
 #include <stdio.h>
 #include <string.h>
-#include "volume.h"
-#include "../display.h"
 
 static void context_state_callback(pa_context *c, void *userdata);
 static void sink_info_callback(pa_context *c, const pa_sink_info *i, int idx,
@@ -37,15 +37,14 @@ void pulse_loop(int pulse_event, pa_mainloop *loop) {
   pa_mainloop_free(loop);
 }
 
-static void event_callback_sink(pa_context *c,
-                                enum pa_subscription_event_type,
+static void event_callback_sink(pa_context *c, enum pa_subscription_event_type,
                                 unsigned int, void *) {
   pa_context_get_sink_info_by_index(c, 0, sink_info_callback, NULL);
 }
 
 static void event_callback_source(pa_context *c,
-                                  enum pa_subscription_event_type,
-                                  unsigned int, void *) {
+                                  enum pa_subscription_event_type, unsigned int,
+                                  void *) {
   pa_context_get_source_info_by_index(c, 0, source_info_callback, NULL);
 }
 
@@ -88,8 +87,8 @@ static void sink_info_callback(pa_context *, const pa_sink_info *i, int,
   }
 }
 
-static void source_info_callback(pa_context *, const pa_source_info *i,
-                                 int, void *) {
+static void source_info_callback(pa_context *, const pa_source_info *i, int,
+                                 void *) {
   if (i) {
     float vol = (float)pa_cvolume_avg(&(i->volume)) / (float)PA_VOLUME_NORM;
     if (i->mute) {

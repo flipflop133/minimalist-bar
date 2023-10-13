@@ -13,7 +13,7 @@
 
 static void parse_i3_workspaces(char *config);
 
-Workspaces workspaces; // TODO don't use hardcore max number of workspaces
+Workspaces workspaces;
 
 void retrieve_i3_socket_path(char *path) {
   FILE *fp = popen("i3 --get-socketpath", "r");
