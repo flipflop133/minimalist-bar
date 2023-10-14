@@ -7,12 +7,7 @@ SRC_FILES = \
     main.c \
     display.c \
     i3ipc.c \
-    $(SRC_DIR)/date.c \
-    $(SRC_DIR)/volume.c \
-    $(SRC_DIR)/network.c \
-    $(SRC_DIR)/media.c \
-    $(SRC_DIR)/battery.c \
-    $(SRC_DIR)/bluetooth.c
+    $(SRC_DIR)/date.c
 
 OUT = i3status
 LIBRARIES = -lpulse -lbluetooth -I/usr/include -lcjson -I/usr/include/freetype2/ -lX11 -lXft

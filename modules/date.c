@@ -1,25 +1,26 @@
 #include "date.h"
 #include "../defs.h"
+
+#include "../display.h"
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-#include "../display.h"
-void *date_update(void *) {
+void *date_update(void *, struct Module *module) {
   int first_iteration = 1;
 
   while (running) {
     pthread_mutex_lock(&mutex);
-    modules[date].string = (char *)malloc((DATE_BUFFER + 1 * sizeof(char)));
-    modules[date].string[0] = '\0';
+    module->string = (char *)malloc((DATE_BUFFER + 1 * sizeof(char)));
+    module->string[0] = '\0';
     pthread_mutex_unlock(&mutex);
     time_t t = time(&t);
     const struct tm *my_time_props = localtime(&t);
-    strftime(modules[date].string, DATE_BUFFER, "%a %d %I:%M", my_time_props);
-    display_modules(modules[date].position);
+    strftime(module->string, DATE_BUFFER, "%a %d %I:%M", my_time_props);
+    display_modules(module->position);
     sleep(first_iteration ? (60 - (my_time_props->tm_sec)) : 60);
     first_iteration = 0;
   }
 
-  free(modules[date].string);
+  free(module->string);
   return NULL;
 }

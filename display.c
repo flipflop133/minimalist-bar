@@ -179,36 +179,34 @@ void display_modules(int position) {
   }
 
   // Display modules
-  int i = 0;
   XGlyphInfo extents;
-
-  while (i < displayOrder.size) {
-    ModuleInfo module = modules[displayOrder.list[i]];
-    if (module.enabled && module.string != NULL &&
-        module.position == position) {
-      XftTextExtentsUtf8(display, font, (XftChar8 *)module.string,
-                         strlen(module.string), &extents);
-      switch (module.position) {
+  current = head;
+  while (current != NULL) {
+    if (current->string != NULL &&
+        current->position == position) {
+      XftTextExtentsUtf8(display, font, (XftChar8 *)current->string,
+                         strlen(current->string), &extents);
+      switch (current->position) {
       case LEFT:
         xCoordinate_left = xCoordinate_left + options.module_left_padding;
-        drawModuleString(xCoordinate_left, yFontCoordinate, module.string);
+        drawModuleString(xCoordinate_left, yFontCoordinate, current->string);
         break;
       case CENTER:
         xCoordinate_center -= extents.xOff / 2;
-        drawModuleString(xCoordinate_center, yFontCoordinate, module.string);
+        drawModuleString(xCoordinate_center, yFontCoordinate, current->string);
         modules_center_width += extents.xOff;
         break;
       case RIGHT:
 
         xCoordinate_right -= extents.xOff;
-        drawModuleString(xCoordinate_right, yFontCoordinate, module.string);
+        drawModuleString(xCoordinate_right, yFontCoordinate, current->string);
         xCoordinate_right -= options.module_left_padding;
         break;
       default:
         break;
       }
     }
-    i++;
+    current = current->next;
   }
   modules_right_x = xCoordinate_right;
   modules_left_x = xCoordinate_left;

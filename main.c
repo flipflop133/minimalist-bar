@@ -17,37 +17,36 @@
 #include <unistd.h>
 static void parse_config(void);
 
-ModuleInfo modules[] = {{.name = "date",
-                         .thread_function = date_update,
-                         .enabled = 0,
-                         .string = NULL},
-                        {.name = "network",
-                         .thread_function = wifi_update,
-                         .enabled = 0,
-                         .string = NULL},
-                        {.name = "bluetooth",
-                         .thread_function = bluetooth_update,
-                         .enabled = 0,
-                         .string = NULL},
-                        {.name = "volume",
-                         .thread_function = volume_update,
-                         .enabled = 0,
-                         .string = NULL},
-                        {.name = "mic",
-                         .thread_function = mic_update,
-                         .enabled = 0,
-                         .string = NULL},
-                        {.name = "media",
-                         .thread_function = media_update,
-                         .enabled = 0,
-                         .string = NULL,
-                         .position = CENTER},
-                        {.name = "battery",
-                         .thread_function = battery_update,
-                         .enabled = 0,
-                         .string = NULL,
-                         .interval = 5}};
-
+// ModuleInfo modules[] = {{.name = "date",
+//                          .thread_function = date_update,
+//                          .enabled = 0,
+//                          .string = NULL},
+//                         {.name = "network",
+//                          .thread_function = wifi_update,
+//                          .enabled = 0,
+//                          .string = NULL},
+//                         {.name = "bluetooth",
+//                          .thread_function = bluetooth_update,
+//                          .enabled = 0,
+//                          .string = NULL},
+//                         {.name = "volume",
+//                          .thread_function = volume_update,
+//                          .enabled = 0,
+//                          .string = NULL},
+//                         {.name = "mic",
+//                          .thread_function = mic_update,
+//                          .enabled = 0,
+//                          .string = NULL},
+//                         {.name = "media",
+//                          .thread_function = media_update,
+//                          .enabled = 0,
+//                          .string = NULL,
+//                          .position = CENTER},
+//                         {.name = "battery",
+//                          .thread_function = battery_update,
+//                          .enabled = 0,
+//                          .string = NULL,
+//                          .interval = 5}};
 DisplayOrder displayOrder;
 Options options;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -77,19 +76,19 @@ void *launchModules(void *) {
   pthread_create(&i3_thread, NULL, listen_to_i3, NULL);
 
   // Start modules threads
-  pthread_t threads[sizeof(modules) / sizeof(modules[0])];
-  for (size_t i = 0; i < sizeof(modules) / sizeof(modules[0]); ++i) {
-    if (modules[i].enabled) {
-      printf("starting module: %s\n", modules[i].name);
-      pthread_create(&threads[i], NULL, modules[i].thread_function, NULL);
-    }
-  }
+  // pthread_t threads[sizeof(modules) / sizeof(modules[0])];
+  // for (size_t i = 0; i < sizeof(modules) / sizeof(modules[0]); ++i) {
+  //   if (modules[i].enabled) {
+  //     printf("starting module: %s\n", modules[i].name);
+  //     pthread_create(&threads[i], NULL, modules[i].thread_function, NULL);
+  //   }
+  // }
   // Wait for modules threads
-  for (size_t i = 0; i < sizeof(modules) / sizeof(modules[0]); ++i) {
-    if (modules[i].enabled) {
-      pthread_join(threads[i], NULL);
-    }
-  }
+  // for (size_t i = 0; i < sizeof(modules) / sizeof(modules[0]); ++i) {
+  //   if (modules[i].enabled) {
+  //     pthread_join(threads[i], NULL);
+  //   }
+  // }
 
   // Wait for i3 thread
   pthread_join(i3_thread, NULL);
@@ -129,7 +128,6 @@ static void parse_config(void) {
   cJSON *json = cJSON_Parse(config);
   cJSON *modules_json =
       cJSON_GetObjectItemCaseSensitive(json, "modules")->child;
-  int c = 0;
   int number_of_modules = 0;
   cJSON *tmp = modules_json;
   while (tmp != NULL) {
@@ -139,41 +137,43 @@ static void parse_config(void) {
   displayOrder.list = (int *)malloc(sizeof(int) * number_of_modules);
 
   // Set modules values from config file
+  int first = 1;
   while (modules_json != NULL) {
-    int found = 0;
-    for (int i = 0; i < (int)(sizeof(modules) / sizeof(modules[0])); ++i) {
-      if (strcmp(modules[i].name, modules_json->string) == 0) {
-        switch (i)
-        {
-        case network:
-          Network network_options;
-          char *interface = cJSON_GetObjectItemCaseSensitive(modules_json, "interface")->valuestring;
-          network_options.interface = malloc(sizeof(char) * strlen(interface));
-          strcpy(network_options.interface, interface);
-          printf("Module name: %s\n", modules_json->string);
-          printf("Interface: %s\n", network_options.interface);
-          modules[i].options = &network_options;
-          break;
-        
-        default:
-          break;
-        }
-        modules[i].enabled = 1;
-        displayOrder.list[c] = i;
-        found = 1;
-        break;
+    current = (struct Module *)malloc(sizeof(struct Module));
+
+    if (strcmp("Network", modules_json->string) == 0) {
+      Network options;
+      current->thread_function = wifi_update;
+      char *interface =
+          cJSON_GetObjectItemCaseSensitive(modules_json, "interface")
+              ->valuestring;
+      options.interface = malloc(sizeof(char) * strlen(interface));
+      strcpy(options.interface, interface);
+      printf("Module name: %s\n", options.interface);
+      current->Module_infos = &options;
+      if(first){
+        head = current;
       }
+      current->next = NULL;
+      current = current->next;
+      
     }
-    if (!found) {
+    if (strcmp("Date", modules_json->string) == 0) {
+      Date options;
+      current->thread_function = date_update;
+      current->Module_infos = &options;
+      if(first){
+        head = current;
+      }
+      current->next = NULL;
+      current = current->next;
+    } else {
       fprintf(stderr, "Error in config file, module %s doesn't exist!\n",
               modules_json->string);
       exit(1);
     }
-
-    c++;
     modules_json = modules_json->next;
   }
-  displayOrder.size = c;
 
   // Parse config options
   cJSON *options_json = cJSON_GetObjectItemCaseSensitive(json, "general");
@@ -187,9 +187,10 @@ static void parse_config(void) {
   strcpy(options.workspace_color,
          (cJSON_GetObjectItemCaseSensitive(options_json, "workspace-color")
               ->valuestring));
-  strcpy(options.workspace_color_urgent,
-         (cJSON_GetObjectItemCaseSensitive(options_json, "workspace-color-urgent")
-              ->valuestring));
+  strcpy(
+      options.workspace_color_urgent,
+      (cJSON_GetObjectItemCaseSensitive(options_json, "workspace-color-urgent")
+           ->valuestring));
   // Font
   char *font_name =
       cJSON_GetObjectItemCaseSensitive(options_json, "font-name")->valuestring;

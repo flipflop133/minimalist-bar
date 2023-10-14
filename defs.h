@@ -10,16 +10,16 @@ extern void *launchModules(void *);
 enum positions { RIGHT, CENTER, LEFT };
 
 // Basic structure of a module
-typedef struct {
-  const char *name;
-  void *(*thread_function)(void *);
-  int enabled;
-  char *string;
-  const int interval;
-  const int position;
-  void *options;
-} ModuleInfo;
-extern ModuleInfo modules[];
+struct Module {
+  struct Module *next;
+  void *(*thread_function)(void *, struct Module *);
+  char* string;
+  int position;
+  void* Module_infos;
+};
+
+struct Module *head = NULL;
+struct Module *current = NULL;
 
 // Structures for specific modules
 typedef struct {
