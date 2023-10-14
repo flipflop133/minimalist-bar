@@ -1,7 +1,9 @@
 {
     "modules": {
         "date": {},
-        "battery": {},
+        "network": {
+            "interface": "enp14s0"
+        },
         "network": {
             "interface": "wlan0"
         },
@@ -19,7 +21,7 @@
         "right-padding": 10,
         "module-left-padding": 30,
         "font-name": "JetBrainsMono Nerd Font",
-        "font-size": 12,
+        "font-size": 14,
         "bar-position": "bottom",
         "bar-height": 40
     }

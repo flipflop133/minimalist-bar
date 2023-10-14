@@ -80,6 +80,7 @@ void *launchModules(void *) {
   pthread_t threads[sizeof(modules) / sizeof(modules[0])];
   for (size_t i = 0; i < sizeof(modules) / sizeof(modules[0]); ++i) {
     if (modules[i].enabled) {
+      printf("starting module: %s\n", modules[i].name);
       pthread_create(&threads[i], NULL, modules[i].thread_function, NULL);
     }
   }
@@ -142,6 +143,21 @@ static void parse_config(void) {
     int found = 0;
     for (int i = 0; i < (int)(sizeof(modules) / sizeof(modules[0])); ++i) {
       if (strcmp(modules[i].name, modules_json->string) == 0) {
+        switch (i)
+        {
+        case network:
+          Network network_options;
+          char *interface = cJSON_GetObjectItemCaseSensitive(modules_json, "interface")->valuestring;
+          network_options.interface = malloc(sizeof(char) * strlen(interface));
+          strcpy(network_options.interface, interface);
+          printf("Module name: %s\n", modules_json->string);
+          printf("Interface: %s\n", network_options.interface);
+          modules[i].options = &network_options;
+          break;
+        
+        default:
+          break;
+        }
         modules[i].enabled = 1;
         displayOrder.list[c] = i;
         found = 1;

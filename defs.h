@@ -1,8 +1,15 @@
 #ifndef DEFS_H
 #define DEFS_H
-#define IW_INTERFACE "wlan0"
 #include <pthread.h>
+
+int remove_nl(char *str);
+void cleanup(int sig);
+extern void *launchModules(void *);
+
+// Modules positions
 enum positions { RIGHT, CENTER, LEFT };
+
+// Basic structure of a module
 typedef struct {
   const char *name;
   void *(*thread_function)(void *);
@@ -10,11 +17,30 @@ typedef struct {
   char *string;
   const int interval;
   const int position;
+  void *options;
 } ModuleInfo;
 extern ModuleInfo modules[];
 
-typedef struct
-{
+// Structures for specific modules
+typedef struct {
+  char *interface;
+} Network;
+
+typedef struct {
+  char *battery;
+} Battery;
+
+typedef struct {
+  char *format;
+} Date;
+
+typedef struct {
+  int max_length_title;
+  int max_length_artist;
+} Media;
+
+/*Bar options*/
+typedef struct {
   // Colors
   char background_color[8];
   char foreground_color[8];
@@ -22,7 +48,7 @@ typedef struct
   char workspace_color_urgent[8];
 
   // Font
-  char* font_name;
+  char *font_name;
   int font_size;
 
   // Sizes
@@ -36,17 +62,18 @@ typedef struct
 } Options;
 extern Options options;
 
+enum modules_names { date, network, bluetooth, volume, mic, media, battery };
 
-enum modules_names { date, network, bluetooth, volume, mic, media, battery};
-enum pulse_events { SINK, SOURCE };
-int remove_nl(char *str);
-void cleanup(int sig);
-extern int running;
+extern int running; // Global state of the application
+
+// Global mutex used to avoid modules race conditions
 extern pthread_mutex_t mutex;
+
+// Display order of modules
 typedef struct {
   int *list;
   int size;
 } DisplayOrder;
 extern DisplayOrder displayOrder;
-extern void* launchModules(void*);
+
 #endif

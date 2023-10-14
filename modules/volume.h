@@ -5,3 +5,4 @@ void *mic_update(void *arg);
 #define MIC_BUFFER 10
 extern pa_mainloop *volume_loop;
 extern pa_mainloop *mic_loop;
+enum pulse_events { SINK, SOURCE };

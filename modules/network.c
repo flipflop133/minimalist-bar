@@ -11,23 +11,39 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include "../display.h"
-void determine_wifi_status(unsigned int flags);
-static void retrieve_initial_status(void);
+void determine_wifi_status(unsigned int flags, int interface_type);
+static void retrieve_initial_status(int interface_type);
 static char *convert_signal_to_icon(int signal);
 int wifi_signal = 1; // TODO : read this value from config file
 
-#define DEFAULT_INTERFACE "wlan0" // TODO : read this value from config file
+static int isWiFiInterface(const char *ifname) {
+    int sock = socket(AF_INET, SOCK_DGRAM, 0);
 
-static void execute_ioctl_command(int command, char *result) {
+    struct iwreq wrq;
+    memset(&wrq, 0, sizeof(struct iwreq));
+    strncpy(wrq.ifr_name, ifname, IFNAMSIZ - 1);
+
+    int result = ioctl(sock, SIOCGIWMODE, &wrq);
+
+    close(sock);
+
+    return (result != -1) ? 1 : 0;
+}
+
+static int execute_ioctl_command(int command, char *result) {
   struct iwreq wreq;
-  sprintf(wreq.ifr_ifrn.ifrn_name, IW_INTERFACE);
+  sprintf(wreq.ifr_ifrn.ifrn_name, ((Network*)(modules[network].options))->interface);
   int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
   // Retrieve the SSID
   if (command == SIOCGIWESSID) {
     wreq.u.essid.pointer = malloc(IW_ESSID_MAX_SIZE + 1);
     wreq.u.essid.length = IW_ESSID_MAX_SIZE + 1;
-    ioctl(sockfd, command, &wreq);
+    
+    if(ioctl(sockfd, command, &wreq) == -1) {
+      return 1;
+    }
+    printf("ok\n");
     strcpy(result, wreq.u.essid.pointer);
     free(wreq.u.essid.pointer);
   }
@@ -36,11 +52,14 @@ static void execute_ioctl_command(int command, char *result) {
     struct iw_statistics stats;
     wreq.u.data.pointer = &stats;
     wreq.u.data.length = sizeof(struct iw_statistics);
-    ioctl(sockfd, command, &wreq);
+    if(ioctl(sockfd, command, &wreq) == -1) {
+      return 1;
+    }
     strcpy(result, convert_signal_to_icon(stats.qual.qual));
   }
 
   close(sockfd);
+  return 0;
 }
 
 static char *convert_signal_to_icon(int signal) {
@@ -58,12 +77,21 @@ static char *convert_signal_to_icon(int signal) {
   }
 }
 
+
 void *wifi_update(void *) {
+  int interface_type = ETHERNET;
   pthread_mutex_lock(&mutex);
   modules[network].string = (char *)malloc((NETWORK_BUFFER * sizeof(char)));
   modules[network].string[0] = '\0';
   pthread_mutex_unlock(&mutex);
-  retrieve_initial_status();
+
+  // Determine interface type
+  printf("ok\n");
+  if(isWiFiInterface(((Network*)(modules[network].options))->interface)){
+    interface_type = WIFI;
+  }
+
+  retrieve_initial_status(interface_type);
 
   struct sockaddr_nl sa;
 
@@ -85,7 +113,7 @@ void *wifi_update(void *) {
     for (nlh = (struct nlmsghdr *)buffer; NLMSG_OK(nlh, len);
          nlh = NLMSG_NEXT(nlh, len)) {
       if (nlh->nlmsg_type == RTM_NEWLINK || nlh->nlmsg_type == RTM_DELLINK) {
-        determine_wifi_status(((struct ifinfomsg *)NLMSG_DATA(nlh))->ifi_flags);
+        determine_wifi_status(((struct ifinfomsg *)NLMSG_DATA(nlh))->ifi_flags, interface_type);
       }
     }
   }
@@ -93,9 +121,9 @@ void *wifi_update(void *) {
   return NULL;
 }
 
-void determine_wifi_status(unsigned int flags) {
+void determine_wifi_status(unsigned int flags, int interface_type) {
   char interface_name[20] = {0};
-  if ((flags & IFF_UP) && (flags & IFF_RUNNING)) {
+  if ((flags & IFF_UP) && (flags & IFF_RUNNING) && (interface_type == WIFI)) {
     // get_interface_name(interface_name);
     execute_ioctl_command(SIOCGIWESSID, interface_name);
     if (wifi_signal) {
@@ -106,18 +134,31 @@ void determine_wifi_status(unsigned int flags) {
     }
     strcat(modules[network].string, interface_name);
   } else if (flags & IFF_UP) {
-    strcpy(modules[network].string, "󰖩 ");
+    if(interface_type == WIFI){
+      strcpy(modules[network].string, "󰖩 ");
+    }
+    else{
+      strcpy(modules[network].string, "󰈁 ");
+    }
+    
   } else {
-    strcpy(modules[network].string, "󰖪 ");
+    if(interface_type == WIFI){
+      strcpy(modules[network].string, "󰖪 ");
+    }
+    else {
+      strcpy(modules[network].string, "󰈂 ");
+    }
   }
   display_modules(modules[network].position);
 }
 
-static void retrieve_initial_status(void) {
+static void retrieve_initial_status(int interface_type) {
   int socId = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
   struct ifreq if_req;
-  (void)strncpy(if_req.ifr_name, DEFAULT_INTERFACE, sizeof(if_req.ifr_name));
+  printf("ok\n");
+  printf("Interface: %s\n", ((Network*)(modules[network].options))->interface);
+  (void)strncpy(if_req.ifr_name, ((Network*)(modules[network].options))->interface, sizeof(if_req.ifr_name));
   ioctl(socId, SIOCGIFFLAGS, &if_req);
-  determine_wifi_status(if_req.ifr_flags);
+  determine_wifi_status(if_req.ifr_flags, interface_type);
   close(socId);
 }
