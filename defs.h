@@ -12,15 +12,15 @@ enum positions { RIGHT, CENTER, LEFT };
 // Basic structure of a module
 struct Module {
   struct Module *next;
-  void *(*thread_function)(void *, struct Module *);
+  void *(*thread_function)(void *);
   char* string;
   int position;
   void* Module_infos;
 };
 
-struct Module *head = NULL;
-struct Module *current = NULL;
-
+extern struct Module *head;
+extern struct Module *current;
+extern int modules_count;
 // Structures for specific modules
 typedef struct {
   char *interface;

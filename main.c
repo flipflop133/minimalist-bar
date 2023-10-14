@@ -50,7 +50,9 @@ static void parse_config(void);
 DisplayOrder displayOrder;
 Options options;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
+struct Module *head = NULL;
+struct Module *current = NULL;
+int modules_count = 0;
 int running = 1;
 
 int main() {
@@ -76,19 +78,20 @@ void *launchModules(void *) {
   pthread_create(&i3_thread, NULL, listen_to_i3, NULL);
 
   // Start modules threads
-  // pthread_t threads[sizeof(modules) / sizeof(modules[0])];
-  // for (size_t i = 0; i < sizeof(modules) / sizeof(modules[0]); ++i) {
-  //   if (modules[i].enabled) {
-  //     printf("starting module: %s\n", modules[i].name);
-  //     pthread_create(&threads[i], NULL, modules[i].thread_function, NULL);
-  //   }
-  // }
+  pthread_t threads[modules_count];
+  current = head;
+  int i = 0;
+  while (current != NULL) {
+    printf("Starting module %s\n", current->thread_function);
+    pthread_create(&threads[i], NULL, current->thread_function, current);
+    current = current->next;
+    i++;
+  }
+
   // Wait for modules threads
-  // for (size_t i = 0; i < sizeof(modules) / sizeof(modules[0]); ++i) {
-  //   if (modules[i].enabled) {
-  //     pthread_join(threads[i], NULL);
-  //   }
-  // }
+  for (int i = 0; i < modules_count; ++i) {
+    pthread_join(threads[i], NULL);
+  }
 
   // Wait for i3 thread
   pthread_join(i3_thread, NULL);
@@ -98,8 +101,8 @@ void *launchModules(void *) {
 
 void cleanup(int) {
   running = 0;
-  pa_mainloop_quit(volume_loop, 0);
-  pa_mainloop_quit(mic_loop, 0);
+  // pa_mainloop_quit(volume_loop, 0); // TODO enable this again
+  // pa_mainloop_quit(mic_loop, 0);
 }
 
 static void parse_config(void) {
@@ -141,38 +144,38 @@ static void parse_config(void) {
   while (modules_json != NULL) {
     current = (struct Module *)malloc(sizeof(struct Module));
 
-    if (strcmp("Network", modules_json->string) == 0) {
+    // Network module
+    if (strcmp("network", modules_json->string) == 0) {
       Network options;
       current->thread_function = wifi_update;
       char *interface =
           cJSON_GetObjectItemCaseSensitive(modules_json, "interface")
               ->valuestring;
-      options.interface = malloc(sizeof(char) * strlen(interface));
+      options.interface = (char *)malloc(sizeof(char) * strlen(interface));
       strcpy(options.interface, interface);
       printf("Module name: %s\n", options.interface);
       current->Module_infos = &options;
-      if(first){
-        head = current;
-      }
-      current->next = NULL;
-      current = current->next;
-      
+
     }
-    if (strcmp("Date", modules_json->string) == 0) {
-      Date options;
+    // Date module
+    else if (strcmp("date", modules_json->string) == 0) {
       current->thread_function = date_update;
-      current->Module_infos = &options;
-      if(first){
-        head = current;
-      }
-      current->next = NULL;
-      current = current->next;
-    } else {
+    }
+    // Unknow module
+    else {
       fprintf(stderr, "Error in config file, module %s doesn't exist!\n",
               modules_json->string);
       exit(1);
     }
+    if (first) {
+      head = current;
+      first = 0;
+    }
+
+    current->next = NULL;
+    current = current->next;
     modules_json = modules_json->next;
+    modules_count++;
   }
 
   // Parse config options

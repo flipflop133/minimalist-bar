@@ -7,9 +7,10 @@ SRC_FILES = \
     main.c \
     display.c \
     i3ipc.c \
-    $(SRC_DIR)/date.c
+    $(SRC_DIR)/date.c \
+    $(SRC_DIR)/network.c
 
-OUT = i3status
+OUT = minimalist_bar
 LIBRARIES = -lpulse -lbluetooth -I/usr/include -lcjson -I/usr/include/freetype2/ -lX11 -lXft
 
 default: release

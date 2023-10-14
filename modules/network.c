@@ -78,9 +78,10 @@ static char *convert_signal_to_icon(int signal) {
 }
 
 
-void *wifi_update(void *, struct Module *module) {
+void *wifi_update(void *arg) {
   int interface_type = ETHERNET;
   pthread_mutex_lock(&mutex);
+  struct Module *module = (struct Module *)arg;
   module->string = (char *)malloc((NETWORK_BUFFER * sizeof(char)));
   module->string[0] = '\0';
   pthread_mutex_unlock(&mutex);

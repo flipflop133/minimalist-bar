@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
-void *date_update(void *, struct Module *module) {
+void *date_update(void *arg) {
   int first_iteration = 1;
-
+  struct Module *module = (struct Module *)arg;
   while (running) {
     pthread_mutex_lock(&mutex);
     module->string = (char *)malloc((DATE_BUFFER + 1 * sizeof(char)));

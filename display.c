@@ -182,6 +182,8 @@ void display_modules(int position) {
   XGlyphInfo extents;
   current = head;
   while (current != NULL) {
+    printf("displaying modules\n");
+    printf("current string: %s\n", current->string);
     if (current->string != NULL &&
         current->position == position) {
       XftTextExtentsUtf8(display, font, (XftChar8 *)current->string,
