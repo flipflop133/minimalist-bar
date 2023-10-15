@@ -10,7 +10,8 @@ SRC_FILES = \
     parser.c \
     $(SRC_DIR)/date.c \
     $(SRC_DIR)/network.c \
-    $(SRC_DIR)/media.c
+    $(SRC_DIR)/media.c \
+    $(SRC_DIR)/bluetooth.c
 
 OUT = minimalist_bar
 LIBRARIES = -lpulse -lbluetooth -I/usr/include -lcjson -I/usr/include/freetype2/ -lX11 -lXft

@@ -4,10 +4,13 @@
         "network": {
             "interface": "enp14s0"
         },
-        "media": {"position": "center"},
+        "media": {
+            "position": "center"
+        },
         "network": {
             "interface": "wlan0"
-        }
+        },
+        "bluetooth": {}
     },
     "general": {
         "background-color": "#353535",

@@ -11,6 +11,7 @@
 
 ## Stuff to add
 
+- [ ] support including config file in config.json, so we can define a desktop.json config and a laptop.json, and include a base.json config in these files so we don't have to redefine common config options in each file
 - [ ] reload the bar when the user modify and save the config file (use notify watch on the file)
 - [ ] support custom modules
 - [ ] add tray support

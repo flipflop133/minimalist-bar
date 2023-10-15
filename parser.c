@@ -56,25 +56,33 @@ static void parse_modules(cJSON *modules_json) {
 
     // Network module
     if (strcmp("network", modules_json->string) == 0) {
-      struct Network options;
+      struct Network *options =
+          (struct Network *)malloc(sizeof(struct Network));
       current->thread_function = wifi_update;
       char *interface =
           cJSON_GetObjectItemCaseSensitive(modules_json, "interface")
               ->valuestring;
-      options.interface = (char *)malloc(sizeof(char) * strlen(interface));
-      strcpy(options.interface, interface);
-      printf("Stored interface: %s\n", options.interface);
-      current->Module_infos = &options;
-
+      options->interface = (char *)malloc(sizeof(char) * strlen(interface));
+      strcpy(options->interface, interface);
+      printf("Stored interface: %s\n", options->interface);
+      current->Module_infos = options;
+      strcpy(current->name, "network");
     }
-    
+
     // Date module
     else if (strcmp("date", modules_json->string) == 0) {
       current->thread_function = date_update;
+      strcpy(current->name, "date");
     }
     // Media module
     else if (strcmp("media", modules_json->string) == 0) {
       current->thread_function = media_update;
+      strcpy(current->name, "media");
+    }
+    // Bluetooth module
+    else if (strcmp("bluetooth", modules_json->string) == 0) {
+      current->thread_function = bluetooth_update;
+      strcpy(current->name, "bluetooth");
     }
     // Unknow module
     else {
@@ -95,6 +103,8 @@ static void parse_modules(cJSON *modules_json) {
       } else {
         current->position = RIGHT;
       }
+    } else {
+      current->position = RIGHT;
     }
     if (first) {
       head = current;
@@ -109,6 +119,7 @@ static void parse_modules(cJSON *modules_json) {
   }
 }
 
+// TODO remove redunduncy of this function
 static void parse_options(cJSON *json) {
   // Parse config options
   cJSON *options_json = cJSON_GetObjectItemCaseSensitive(json, "general");

@@ -12,6 +12,7 @@ enum positions { RIGHT, CENTER, LEFT };
 // Basic structure of a module
 struct Module {
   struct Module *next;
+  char name[50];
   void *(*thread_function)(void *);
   char* string;
   int position;

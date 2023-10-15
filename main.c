@@ -23,9 +23,9 @@ int running = 1;
 
 int main() {
   parse_config();
-
+  printf("Starting...\n");
   signal(SIGTERM, cleanup);
-  signal(SIGINT, cleanup);
+  //signal(SIGINT, cleanup);
 
   // Start display thread
   pthread_t display_thread;

@@ -17,6 +17,7 @@ void *media_update(void *arg) {
   if (fp != NULL) {
     while ((fgets(module->string, MEDIA_BUFFER, fp) != NULL) && running) {
       remove_nl(module->string);
+      printf("media calling display_modules\n");
       display_modules(module->position);
     }
     pclose(fp);

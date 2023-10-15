@@ -85,6 +85,7 @@ void *wifi_update(void *arg) {
   pthread_mutex_unlock(&mutex);
 
   // Determine interface type
+  printf("pos: %d\n", module->position);
   printf("Interface: %s\n", ((struct Network*)(module->Module_infos))->interface);
   if(isWiFiInterface(((struct Network*)(module->Module_infos))->interface)){
     interface_type = WIFI;
@@ -148,6 +149,7 @@ void determine_wifi_status(unsigned int flags, int interface_type, struct Module
       strcpy(module->string, "󰈂 ");
     }
   }
+  printf("network calling display_modules\n");
   display_modules(module->position);
 }
 

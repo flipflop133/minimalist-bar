@@ -93,6 +93,7 @@ void *display_graphic_bar(void *) {
   while (1) {
     XNextEvent(display, &event);
     if (event.type == Expose) {
+      printf("event exposed\n");
       display_modules(LEFT);
       display_modules(CENTER);
       display_modules(RIGHT);
@@ -181,11 +182,16 @@ void display_modules(int position) {
   // Display modules
   XGlyphInfo extents;
   current = head;
+  printf("displaying modules\n");
   while (current != NULL) {
-    if (current->string != NULL &&
+    if (current->string != NULL && current->string[0] != '\0' &&
         current->position == position) {
       XftTextExtentsUtf8(display, font, (XftChar8 *)current->string,
                          strlen(current->string), &extents);
+      printf("debug infos\n");
+      printf("current: %s\n", current->name);
+      printf("current string: %s\n", current->string);
+      printf("current pos: %d\n", current->position);
       switch (current->position) {
       case LEFT:
         xCoordinate_left = xCoordinate_left + options.module_left_padding;
@@ -211,7 +217,9 @@ void display_modules(int position) {
   modules_left_x = xCoordinate_left;
   modules_center_x = xCoordinate_center;
   XFlush(display);
+  printf("displaying modules done\n");
   pthread_mutex_unlock(&mutex);
+  
 }
 
 void clearModuleArea(int x, int y, int width) {

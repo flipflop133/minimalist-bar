@@ -9,10 +9,13 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-void *bluetooth_update(void *) {
+void *bluetooth_update(void *arg) {
+  printf("enter bluetooth_update\n");
+  struct Module *module = (struct Module *)arg;
+  printf("ok bluetooth_update\n");
   pthread_mutex_lock(&mutex);
-  modules[bluetooth].string = (char *)malloc((BLUETOOTH_BUFFER * sizeof(char)));
-  modules[bluetooth].string[0] = '\0';
+  module->string = (char *)malloc((BLUETOOTH_BUFFER * sizeof(char)));
+  module->string[0] = '\0';
   pthread_mutex_unlock(&mutex);
   int dev_id = hci_get_route(NULL);
   int sock = hci_open_dev(dev_id);
@@ -20,7 +23,7 @@ void *bluetooth_update(void *) {
 
   while (running) {
     if (hci_read_local_version(sock, &ver, 0) < 0) {
-      strcpy(modules[bluetooth].string, "󰂲");
+      strcpy(module->string, "󰂲");
     } else {
       struct hci_conn_list_req *cl;
       struct hci_conn_info *ci;
@@ -37,18 +40,19 @@ void *bluetooth_update(void *) {
           ba2str(&ci->bdaddr, remote_device_address);
           char *name = (char *)malloc(30 * sizeof(char));
           hci_read_remote_name(sock, &ci->bdaddr, sizeof(name), name, 0);
-          sprintf(modules[bluetooth].string, "󰂱 %s", name);
+          sprintf(module->string, "󰂱 %s", name);
           free(name);
         }
       } else {
-        strcpy(modules[bluetooth].string, "󰂯");
+        strcpy(module->string, "󰂯");
       }
       free(cl);
     }
     sleep(1);
   }
-  display_modules(modules[bluetooth].position);
+  printf("bt calling display_modules\n");
+  display_modules(module->position);
   close(sock);
-  free(modules[bluetooth].string);
+  free(module->string);
   return 0;
 }
