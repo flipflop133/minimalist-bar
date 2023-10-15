@@ -32,7 +32,7 @@ static int isWiFiInterface(const char *ifname) {
 
 static int execute_ioctl_command(int command, char *result, struct Module *module) {
   struct iwreq wreq;
-  sprintf(wreq.ifr_ifrn.ifrn_name, ((Network*)(module->Module_infos))->interface);
+  sprintf(wreq.ifr_ifrn.ifrn_name, ((struct Network*)(module->Module_infos))->interface);
   int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
   // Retrieve the SSID
@@ -43,7 +43,6 @@ static int execute_ioctl_command(int command, char *result, struct Module *modul
     if(ioctl(sockfd, command, &wreq) == -1) {
       return 1;
     }
-    printf("ok\n");
     strcpy(result, wreq.u.essid.pointer);
     free(wreq.u.essid.pointer);
   }
@@ -77,7 +76,6 @@ static char *convert_signal_to_icon(int signal) {
   }
 }
 
-
 void *wifi_update(void *arg) {
   int interface_type = ETHERNET;
   pthread_mutex_lock(&mutex);
@@ -87,8 +85,8 @@ void *wifi_update(void *arg) {
   pthread_mutex_unlock(&mutex);
 
   // Determine interface type
-  printf("ok\n");
-  if(isWiFiInterface(((Network*)(module->Module_infos))->interface)){
+  printf("Interface: %s\n", ((struct Network*)(module->Module_infos))->interface);
+  if(isWiFiInterface(((struct Network*)(module->Module_infos))->interface)){
     interface_type = WIFI;
   }
 
@@ -156,9 +154,7 @@ void determine_wifi_status(unsigned int flags, int interface_type, struct Module
 static void retrieve_initial_status(int interface_type, struct Module *module) {
   int socId = socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
   struct ifreq if_req;
-  printf("ok\n");
-  printf("Interface: %s\n", ((Network*)(module->Module_infos))->interface);
-  (void)strncpy(if_req.ifr_name, ((Network*)(module->Module_infos))->interface, sizeof(if_req.ifr_name));
+  (void)strncpy(if_req.ifr_name, ((struct Network*)(module->Module_infos))->interface, sizeof(if_req.ifr_name));
   ioctl(socId, SIOCGIFFLAGS, &if_req);
   determine_wifi_status(if_req.ifr_flags, interface_type, module);
   close(socId);

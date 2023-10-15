@@ -22,9 +22,9 @@ extern struct Module *head;
 extern struct Module *current;
 extern int modules_count;
 // Structures for specific modules
-typedef struct {
+struct Network {
   char *interface;
-} Network;
+};
 
 typedef struct {
   char *battery;

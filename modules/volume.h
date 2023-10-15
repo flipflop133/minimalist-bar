@@ -1,3 +1,5 @@
+#ifndef VOLUME_H
+#define VOLUME_H
 #include <pulse/pulseaudio.h>
 void *volume_update(void *arg);
 void *mic_update(void *arg);
@@ -6,3 +8,4 @@ void *mic_update(void *arg);
 extern pa_mainloop *volume_loop;
 extern pa_mainloop *mic_loop;
 enum pulse_events { SINK, SOURCE };
+#endif

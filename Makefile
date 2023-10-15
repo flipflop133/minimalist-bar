@@ -7,8 +7,10 @@ SRC_FILES = \
     main.c \
     display.c \
     i3ipc.c \
+    parser.c \
     $(SRC_DIR)/date.c \
-    $(SRC_DIR)/network.c
+    $(SRC_DIR)/network.c \
+    $(SRC_DIR)/media.c
 
 OUT = minimalist_bar
 LIBRARIES = -lpulse -lbluetooth -I/usr/include -lcjson -I/usr/include/freetype2/ -lX11 -lXft

@@ -182,8 +182,6 @@ void display_modules(int position) {
   XGlyphInfo extents;
   current = head;
   while (current != NULL) {
-    printf("displaying modules\n");
-    printf("current string: %s\n", current->string);
     if (current->string != NULL &&
         current->position == position) {
       XftTextExtentsUtf8(display, font, (XftChar8 *)current->string,
@@ -199,7 +197,6 @@ void display_modules(int position) {
         modules_center_width += extents.xOff;
         break;
       case RIGHT:
-
         xCoordinate_right -= extents.xOff;
         drawModuleString(xCoordinate_right, yFontCoordinate, current->string);
         xCoordinate_right -= options.module_left_padding;
