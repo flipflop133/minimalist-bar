@@ -1,16 +1,12 @@
 {
     "modules": {
+        "media": {"position": "center"},
         "date": {},
-        "network": {
-            "interface": "enp14s0"
-        },
-        "media": {
-            "position": "center"
-        },
-        "network": {
-            "interface": "wlan0"
-        },
-        "bluetooth": {}
+        "network": {"interface": "wlan0"},
+        "network": {"interface": "enp14s0"},
+        "bluetooth": {},
+        "volume": {},
+        "mic": {}
     },
     "general": {
         "background-color": "#353535",

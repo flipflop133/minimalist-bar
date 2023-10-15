@@ -112,13 +112,21 @@ void *display_graphic_bar(void *) {
 }
 
 int workspaces_width = 0;
+
+// Needed because if we use XClearArea with workspaces_width = 0, we clear the
+// whole bar including the modules!
+int workspaces_init = 0;
 void display_workspaces() {
   int workspace_padding = options.workspace_padding;
   int padding = 20;
   int xCoordinate = workspace_padding / 2;
   XGlyphInfo extents;
-  XClearArea(display, window, 0, 0, workspaces_width,
+  if(workspaces_init) {
+    XClearArea(display, window, 0, 0, workspaces_width,
              DisplayHeight(display, screen_num), False);
+    
+  }
+
 
   for (unsigned short i = 0; i < workspaces.size; i++) {
     if (workspaces.workspaces[i].num == 0) {
@@ -143,6 +151,7 @@ void display_workspaces() {
   }
   workspaces_width = xCoordinate;
   XFlush(display);
+  workspaces_init = 1;
 }
 
 int right_padding = 10;
@@ -152,7 +161,9 @@ int modules_center_width = 0;
 int modules_left_x = 0;
 int modules_left_width = 0;
 void display_modules(int position) {
+    printf("\ndisplay_modules called\n");
   pthread_mutex_lock(&mutex);
+    printf("display_modules entered\n");
   if (display == NULL || font == NULL || xftDraw == NULL) {
     return;
   }
@@ -181,15 +192,17 @@ void display_modules(int position) {
 
   // Display modules
   XGlyphInfo extents;
-  current = head;
-  printf("displaying modules\n");
+  struct Module *current = head;
+
+  printf("current[0]: %c\n", current->string[0]);
   while (current != NULL) {
     if (current->string != NULL && current->string[0] != '\0' &&
         current->position == position) {
-      XftTextExtentsUtf8(display, font, (XftChar8 *)current->string,
-                         strlen(current->string), &extents);
       printf("debug infos\n");
       printf("current: %s\n", current->name);
+      XftTextExtentsUtf8(display, font, (XftChar8 *)current->string,
+                         strlen(current->string), &extents);
+      
       printf("current string: %s\n", current->string);
       printf("current pos: %d\n", current->position);
       switch (current->position) {

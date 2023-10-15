@@ -78,11 +78,12 @@ static char *convert_signal_to_icon(int signal) {
 
 void *wifi_update(void *arg) {
   int interface_type = ETHERNET;
-  pthread_mutex_lock(&mutex);
   struct Module *module = (struct Module *)arg;
-  module->string = (char *)malloc((NETWORK_BUFFER * sizeof(char)));
-  module->string[0] = '\0';
-  pthread_mutex_unlock(&mutex);
+  // pthread_mutex_lock(&mutex);
+  // struct Module *module = (struct Module *)arg;
+  // module->string = (char *)malloc((NETWORK_BUFFER * sizeof(char)));
+  // module->string[0] = '\0';
+  // pthread_mutex_unlock(&mutex);
 
   // Determine interface type
   printf("pos: %d\n", module->position);

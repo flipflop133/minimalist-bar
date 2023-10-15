@@ -12,6 +12,8 @@ static void source_info_callback(pa_context *c, const pa_source_info *i,
                                  int idx, void *userdata);
 pa_mainloop *volume_loop = NULL;
 pa_mainloop *mic_loop = NULL;
+struct Module *volume_module = NULL;
+struct Module *mic_module = NULL;
 void pulse_loop(int pulse_event, pa_mainloop *loop) {
   pa_mainloop_api *api;
   pa_context *context = NULL;
@@ -72,18 +74,18 @@ static void sink_info_callback(pa_context *, const pa_sink_info *i, int,
   if (i) {
     float vol = (float)pa_cvolume_avg(&(i->volume)) / (float)PA_VOLUME_NORM;
     if (i->mute) {
-      strcpy(modules[volume].string, "󰝟");
+      strcpy(volume_module->string, "󰝟");
     } else {
       vol = vol * 100.0F;
       if (vol >= 60) {
-        sprintf(modules[volume].string, "󰕾 %.f%%", vol);
+        sprintf(volume_module->string, "󰕾 %.f%%", vol);
       } else if (vol >= 30) {
-        sprintf(modules[volume].string, "󰖀 %.f%%", vol);
+        sprintf(volume_module->string, "󰖀 %.f%%", vol);
       } else {
-        sprintf(modules[volume].string, "󰕿 %.f%%", vol);
+        sprintf(volume_module->string, "󰕿 %.f%%", vol);
       }
     }
-    display_modules(modules[volume].position);
+    display_modules(volume_module->position);
   }
 }
 
@@ -92,30 +94,34 @@ static void source_info_callback(pa_context *, const pa_source_info *i, int,
   if (i) {
     float vol = (float)pa_cvolume_avg(&(i->volume)) / (float)PA_VOLUME_NORM;
     if (i->mute) {
-      strcpy(modules[mic].string, "󰍭");
+      strcpy(mic_module->string, "󰍭");
     } else {
-      sprintf(modules[mic].string, "󰍮 %.f%%", (vol * 100.0F));
+      sprintf(mic_module->string, "󰍮 %.f%%", (vol * 100.0F));
     }
-    display_modules(modules[mic].position);
+    display_modules(mic_module->position);
   }
 }
 
-void *volume_update(void *) {
-  pthread_mutex_lock(&mutex);
-  modules[volume].string = (char *)malloc((VOLUME_BUFFER * sizeof(char)));
-  modules[volume].string[0] = '\0';
-  pthread_mutex_unlock(&mutex);
+void *volume_update(void *arg) {
+  struct Module *module = (struct Module *)arg;
+  volume_module = module;
+  // pthread_mutex_lock(&mutex);
+  // module->string = (char *)malloc((VOLUME_BUFFER * sizeof(char)));
+  // module->string[0] = '\0';
+  // pthread_mutex_unlock(&mutex);
   pulse_loop(SINK, volume_loop);
-  free(modules[volume].string);
+  free(module->string);
   return NULL;
 }
 
-void *mic_update(void *) {
-  pthread_mutex_lock(&mutex);
-  modules[mic].string = (char *)malloc((MIC_BUFFER * sizeof(char)));
-  modules[mic].string[0] = '\0';
-  pthread_mutex_unlock(&mutex);
+void *mic_update(void *arg) {
+  struct Module *module = (struct Module *)arg;
+  mic_module = module;
+  // pthread_mutex_lock(&mutex);
+  // module->string = (char *)malloc((MIC_BUFFER * sizeof(char)));
+  // module->string[0] = '\0';
+  // pthread_mutex_unlock(&mutex);
   pulse_loop(SOURCE, mic_loop);
-  free(modules[mic].string);
+  free(module->string);
   return NULL;
 }

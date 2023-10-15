@@ -51,6 +51,7 @@ static void parse_modules(cJSON *modules_json) {
   // Set modules values from config file
   int first = 1;
   struct Module *previous = NULL;
+  struct Module *current = NULL;
   while (modules_json != NULL) {
     current = (struct Module *)malloc(sizeof(struct Module));
 
@@ -78,11 +79,22 @@ static void parse_modules(cJSON *modules_json) {
     else if (strcmp("media", modules_json->string) == 0) {
       current->thread_function = media_update;
       strcpy(current->name, "media");
+
     }
     // Bluetooth module
     else if (strcmp("bluetooth", modules_json->string) == 0) {
       current->thread_function = bluetooth_update;
       strcpy(current->name, "bluetooth");
+    }
+    // Volume module
+    else if (strcmp("volume", modules_json->string) == 0) {
+      current->thread_function = volume_update;
+      strcpy(current->name, "volume");
+    }
+    // Mic module
+    else if (strcmp("mic", modules_json->string) == 0) {
+      current->thread_function = mic_update;
+      strcpy(current->name, "mic");
     }
     // Unknow module
     else {
@@ -90,7 +102,8 @@ static void parse_modules(cJSON *modules_json) {
               modules_json->string);
       exit(1);
     }
-
+    current->string = (char *)malloc((200 * sizeof(char)));
+    current->string[0] = '\0';
     cJSON *json_position =
         cJSON_GetObjectItemCaseSensitive(modules_json, "position");
 

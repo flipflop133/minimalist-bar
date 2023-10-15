@@ -20,7 +20,6 @@ struct Module {
 };
 
 extern struct Module *head;
-extern struct Module *current;
 extern int modules_count;
 // Structures for specific modules
 struct Network {

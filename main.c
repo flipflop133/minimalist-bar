@@ -17,7 +17,6 @@ DisplayOrder displayOrder;
 Options options;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 struct Module *head = NULL;
-struct Module *current = NULL;
 int modules_count = 0;
 int running = 1;
 
@@ -44,14 +43,14 @@ void *launchModules(void *) {
 
   // Start modules threads
   pthread_t threads[modules_count];
-  current = head;
+  struct Module *current = head;
   int i = 0;
   while (current != NULL) {
+    printf("Starting module %s\n", current->name);
     pthread_create(&threads[i], NULL, current->thread_function, current);
     current = current->next;
     i++;
   }
-
   // Wait for modules threads
   for (int i = 0; i < modules_count; ++i) {
     pthread_join(threads[i], NULL);
