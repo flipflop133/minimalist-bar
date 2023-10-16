@@ -79,15 +79,12 @@ static char *convert_signal_to_icon(int signal) {
 void *wifi_update(void *arg) {
   int interface_type = ETHERNET;
   struct Module *module = (struct Module *)arg;
-  // pthread_mutex_lock(&mutex);
-  // struct Module *module = (struct Module *)arg;
-  // module->string = (char *)malloc((NETWORK_BUFFER * sizeof(char)));
-  // module->string[0] = '\0';
-  // pthread_mutex_unlock(&mutex);
+  pthread_mutex_lock(&mutex);
+  module->string = (char *)malloc((NETWORK_BUFFER * sizeof(char)));
+  module->string[0] = '\0';
+  pthread_mutex_unlock(&mutex);
 
   // Determine interface type
-  printf("pos: %d\n", module->position);
-  printf("Interface: %s\n", ((struct Network*)(module->Module_infos))->interface);
   if(isWiFiInterface(((struct Network*)(module->Module_infos))->interface)){
     interface_type = WIFI;
   }
@@ -150,7 +147,6 @@ void determine_wifi_status(unsigned int flags, int interface_type, struct Module
       strcpy(module->string, "󰈂 ");
     }
   }
-  printf("network calling display_modules\n");
   display_modules(module->position);
 }
 

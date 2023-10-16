@@ -20,10 +20,13 @@ struct Module *head = NULL;
 int modules_count = 0;
 int running = 1;
 
+void test(){
+  printf("woke from suspend!!\n");
+}
 int main() {
   parse_config();
-  printf("Starting...\n");
   signal(SIGTERM, cleanup);
+  signal(SIGCONT, test);
   //signal(SIGINT, cleanup);
 
   // Start display thread
@@ -46,7 +49,6 @@ void *launchModules(void *) {
   struct Module *current = head;
   int i = 0;
   while (current != NULL) {
-    printf("Starting module %s\n", current->name);
     pthread_create(&threads[i], NULL, current->thread_function, current);
     current = current->next;
     i++;

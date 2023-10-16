@@ -10,13 +10,11 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 void *bluetooth_update(void *arg) {
-  printf("enter bluetooth_update\n");
   struct Module *module = (struct Module *)arg;
-  printf("ok bluetooth_update\n");
-  // pthread_mutex_lock(&mutex);
-  // module->string = (char *)malloc((BLUETOOTH_BUFFER * sizeof(char)));
-  // module->string[0] = '\0';
-  // pthread_mutex_unlock(&mutex);
+  pthread_mutex_lock(&mutex);
+  module->string = (char *)malloc((BLUETOOTH_BUFFER * sizeof(char)));
+  module->string[0] = '\0';
+  pthread_mutex_unlock(&mutex);
   int dev_id = hci_get_route(NULL);
   int sock = hci_open_dev(dev_id);
   struct hci_version ver;
@@ -48,8 +46,7 @@ void *bluetooth_update(void *arg) {
       }
       free(cl);
     }
-    sleep(1);
-    printf("bt calling display_modules\n");
+    sleep(1); // TODO don't sleep
     display_modules(module->position);
   }
   close(sock);

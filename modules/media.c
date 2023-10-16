@@ -5,10 +5,10 @@
 #include "../display.h"
 void *media_update(void *arg) {
   struct Module *module = (struct Module *)arg;
-  // pthread_mutex_lock(&mutex);
-  // module->string = (char *)malloc((MEDIA_BUFFER+1 * sizeof(char)));
-  // module->string[0] = '\0';
-  // pthread_mutex_unlock(&mutex);
+  pthread_mutex_lock(&mutex);
+  module->string = (char *)malloc((MEDIA_BUFFER+1 * sizeof(char)));
+  module->string[0] = '\0';
+  pthread_mutex_unlock(&mutex);
   FILE *fp = popen("playerctl -Fa metadata --format '{{trunc(artist,15)}} - "
                    "{{trunc(title,15)}}'",
                    "r");

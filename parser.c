@@ -65,7 +65,6 @@ static void parse_modules(cJSON *modules_json) {
               ->valuestring;
       options->interface = (char *)malloc(sizeof(char) * strlen(interface));
       strcpy(options->interface, interface);
-      printf("Stored interface: %s\n", options->interface);
       current->Module_infos = options;
       strcpy(current->name, "network");
     }
@@ -102,8 +101,7 @@ static void parse_modules(cJSON *modules_json) {
               modules_json->string);
       exit(1);
     }
-    current->string = (char *)malloc((200 * sizeof(char)));
-    current->string[0] = '\0';
+ 
     cJSON *json_position =
         cJSON_GetObjectItemCaseSensitive(modules_json, "position");
 

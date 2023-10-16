@@ -161,9 +161,7 @@ int modules_center_width = 0;
 int modules_left_x = 0;
 int modules_left_width = 0;
 void display_modules(int position) {
-    printf("\ndisplay_modules called\n");
   pthread_mutex_lock(&mutex);
-    printf("display_modules entered\n");
   if (display == NULL || font == NULL || xftDraw == NULL) {
     return;
   }
@@ -194,17 +192,11 @@ void display_modules(int position) {
   XGlyphInfo extents;
   struct Module *current = head;
 
-  printf("current[0]: %c\n", current->string[0]);
   while (current != NULL) {
     if (current->string != NULL && current->string[0] != '\0' &&
         current->position == position) {
-      printf("debug infos\n");
-      printf("current: %s\n", current->name);
       XftTextExtentsUtf8(display, font, (XftChar8 *)current->string,
                          strlen(current->string), &extents);
-      
-      printf("current string: %s\n", current->string);
-      printf("current pos: %d\n", current->position);
       switch (current->position) {
       case LEFT:
         xCoordinate_left = xCoordinate_left + options.module_left_padding;
@@ -230,7 +222,6 @@ void display_modules(int position) {
   modules_left_x = xCoordinate_left;
   modules_center_x = xCoordinate_center;
   XFlush(display);
-  printf("displaying modules done\n");
   pthread_mutex_unlock(&mutex);
   
 }
