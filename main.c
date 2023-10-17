@@ -63,7 +63,7 @@ void *launchModules(void *) {
 
 void cleanup(int) {
   running = 0;
-  pa_mainloop_quit(volume_loop, 0); // TODO enable this again
+  pa_mainloop_quit(volume_loop, 0);
   pa_mainloop_quit(mic_loop, 0);
 }
 

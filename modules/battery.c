@@ -12,7 +12,6 @@ typedef struct {
   char *icon;
 } bat_status;
 
-// TODO -> read those values from config file
 #define BATTERY_PATH "/sys/class/power_supply/"
 
 bat_status batList[] = {

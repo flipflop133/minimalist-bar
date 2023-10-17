@@ -30,9 +30,14 @@ struct Battery {
   char *battery; // default battery
 };
 
-typedef struct {
+struct Date {
   char *format;
-} Date;
+};
+
+struct Media {
+  int title_max_length;
+  int artist_max_length;
+};
 
 typedef struct {
   int max_length_title;

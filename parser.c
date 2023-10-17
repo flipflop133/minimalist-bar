@@ -71,14 +71,23 @@ static void parse_modules(cJSON *modules_json) {
 
     // Date module
     else if (strcmp("date", modules_json->string) == 0) {
+      struct Date *options = (struct Date *)malloc(sizeof(struct Date));
+      char *format =
+          cJSON_GetObjectItemCaseSensitive(modules_json, "format")
+              ->valuestring;
+      options->format = (char*) malloc(sizeof(char) * strlen(format));
+      strcpy(options->format, format);
+      current->Module_infos = options;
       current->thread_function = date_update;
       strcpy(current->name, "date");
     }
 
     // Battery module
     else if (strcmp("battery", modules_json->string) == 0) {
-      struct Battery *options = (struct Battery *)malloc(sizeof(struct Battery));
-      char *battery = cJSON_GetObjectItemCaseSensitive(modules_json, "battery")->valuestring;
+      struct Battery *options =
+          (struct Battery *)malloc(sizeof(struct Battery));
+      char *battery = cJSON_GetObjectItemCaseSensitive(modules_json, "battery")
+                          ->valuestring;
       current->thread_function = battery_update;
       options->battery = (char *)malloc(sizeof(char) * strlen(battery));
       strcpy(options->battery, battery);
@@ -88,6 +97,13 @@ static void parse_modules(cJSON *modules_json) {
 
     // Media module
     else if (strcmp("media", modules_json->string) == 0) {
+       struct Media *options =
+          (struct Media *)malloc(sizeof(struct Media));      
+      options->title_max_length = cJSON_GetObjectItemCaseSensitive(modules_json, "title-max-length")
+                          ->valueint;
+      options->artist_max_length = cJSON_GetObjectItemCaseSensitive(modules_json, "artist-max-length")
+                          ->valueint;
+      current->Module_infos = options;
       current->thread_function = media_update;
       strcpy(current->name, "media");
 
@@ -113,7 +129,7 @@ static void parse_modules(cJSON *modules_json) {
               modules_json->string);
       exit(1);
     }
- 
+
     cJSON *json_position =
         cJSON_GetObjectItemCaseSensitive(modules_json, "position");
 

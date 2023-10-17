@@ -16,7 +16,7 @@ void *date_update(void *arg) {
   while (running) {
     time_t t = time(&t);
     const struct tm *my_time_props = localtime(&t);
-    strftime(module->string, DATE_BUFFER, "%a %d %I:%M", my_time_props);
+    strftime(module->string, DATE_BUFFER, ((struct Date*)(module->Module_infos))->format, my_time_props);
 
     // This avoid calling display_modules too much
     if (strcmp(module->string, previous_string) != 0) {

@@ -3,9 +3,10 @@
 ## TODO (sorted by priority)
 
 - [ ] put all magic values in config file (see TODO in code)
-- [ ] read default battery from config file
 - [ ] add a xwindow module (to display windows name on the left)
 - [ ] allow empty config file, so use default values
+- [ ] read config file path from program arguments
+- [ ] create wiki to explain at least the config file
 
 ## Stuff to add
 
@@ -15,3 +16,4 @@
 - [ ] add tray support
 - [ ] support hover and clicks?
 - [ ] handle text overflow of modules (carousel system?)
+- [ ] allow custom icons for modules

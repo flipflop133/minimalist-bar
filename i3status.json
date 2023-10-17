@@ -1,6 +1,6 @@
 {
     "modules": {
-        "date": {},
+        "date": {"format": "%a %d %I:%M"},
         "battery": {
             "battery": "BAT0"
         },
@@ -11,7 +11,9 @@
         "volume": {},
         "mic": {},
         "media": {
-            "position": "center"
+            "position": "center",
+            "title-max-length": 15,
+            "artist-max-length": 15
         }
     },
     "general": {
