@@ -13,7 +13,6 @@ void *bluetooth_update(void *arg) {
   struct Module *module = (struct Module *)arg;
   pthread_mutex_lock(&mutex);
   module->string = (char *)malloc((BLUETOOTH_BUFFER * sizeof(char)));
-  module->string[0] = '\0';
   pthread_mutex_unlock(&mutex);
   int dev_id = hci_get_route(NULL);
   int sock = hci_open_dev(dev_id);

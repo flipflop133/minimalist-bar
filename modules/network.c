@@ -81,7 +81,6 @@ void *wifi_update(void *arg) {
   struct Module *module = (struct Module *)arg;
   pthread_mutex_lock(&mutex);
   module->string = (char *)malloc((NETWORK_BUFFER * sizeof(char)));
-  module->string[0] = '\0';
   pthread_mutex_unlock(&mutex);
 
   // Determine interface type

@@ -107,7 +107,6 @@ void *volume_update(void *arg) {
   volume_module = module;
   pthread_mutex_lock(&mutex);
   module->string = (char *)malloc((VOLUME_BUFFER * sizeof(char)));
-  module->string[0] = '\0';
   pthread_mutex_unlock(&mutex);
   pulse_loop(SINK, volume_loop);
   free(module->string);
@@ -119,7 +118,6 @@ void *mic_update(void *arg) {
   mic_module = module;
   pthread_mutex_lock(&mutex);
   module->string = (char *)malloc((MIC_BUFFER * sizeof(char)));
-  module->string[0] = '\0';
   pthread_mutex_unlock(&mutex);
   pulse_loop(SOURCE, mic_loop);
   free(module->string);

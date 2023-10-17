@@ -20,14 +20,10 @@ struct Module *head = NULL;
 int modules_count = 0;
 int running = 1;
 
-void test(){
-  printf("woke from suspend!!\n");
-}
 int main() {
   parse_config();
   signal(SIGTERM, cleanup);
-  signal(SIGCONT, test);
-  //signal(SIGINT, cleanup);
+  signal(SIGINT, cleanup);
 
   // Start display thread
   pthread_t display_thread;
@@ -53,6 +49,7 @@ void *launchModules(void *) {
     current = current->next;
     i++;
   }
+
   // Wait for modules threads
   for (int i = 0; i < modules_count; ++i) {
     pthread_join(threads[i], NULL);
@@ -66,8 +63,8 @@ void *launchModules(void *) {
 
 void cleanup(int) {
   running = 0;
-  // pa_mainloop_quit(volume_loop, 0); // TODO enable this again
-  // pa_mainloop_quit(mic_loop, 0);
+  pa_mainloop_quit(volume_loop, 0); // TODO enable this again
+  pa_mainloop_quit(mic_loop, 0);
 }
 
 int remove_nl(char *str) {

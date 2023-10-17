@@ -9,6 +9,7 @@ SRC_FILES = \
     i3ipc.c \
     parser.c \
     $(SRC_DIR)/date.c \
+    $(SRC_DIR)/battery.c \
     $(SRC_DIR)/network.c \
     $(SRC_DIR)/media.c \
     $(SRC_DIR)/bluetooth.c \

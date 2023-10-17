@@ -26,9 +26,9 @@ struct Network {
   char *interface;
 };
 
-typedef struct {
-  char *battery;
-} Battery;
+struct Battery {
+  char *battery; // default battery
+};
 
 typedef struct {
   char *format;

@@ -14,7 +14,6 @@ typedef struct {
 
 // TODO -> read those values from config file
 #define BATTERY_PATH "/sys/class/power_supply/"
-#define BATTERY "BAT0"
 
 bat_status batList[] = {
     {90, "󰁹"}, // >= 90%
@@ -30,15 +29,15 @@ bat_status batList[] = {
     {-1, "󰂎"}, // >= 0%
 };
 
-void *battery_update(void *) {
+void *battery_update(void *arg) {
+  struct Module *module = (struct Module *)arg;
   pthread_mutex_lock(&mutex);
-  modules[battery].string = (char *)malloc((BATTERY_BUFFER * sizeof(char)));
-  modules[battery].string[0] = '\0';
+  module->string = (char *)malloc((BATTERY_BUFFER * sizeof(char)));
   pthread_mutex_unlock(&mutex);
 
   char bat_path[50];
   strcat(bat_path, BATTERY_PATH);
-  strcat(bat_path, BATTERY);
+  strcat(bat_path, ((struct Battery*)module->Module_infos)->battery);
   FILE *fbat_cap;
   FILE *fbat_status;
   char bat_cap[5];
@@ -70,25 +69,26 @@ void *battery_update(void *) {
         for (int i = 0; i < (int)(sizeof(batList) / (sizeof(bat_status)));
              i++) {
           if (capacity > batList[i].capacity_threshold) {
-            sprintf(modules[battery].string, "%s %d%%", batList[i].icon,
+            sprintf(module->string, "%s %d%%", batList[i].icon,
                     capacity);
             break;
           }
         }
       } else {
-        sprintf(modules[battery].string, "󰂄 %d%%", capacity);
+        sprintf(module->string, "󰂄 %d%%", capacity);
       }
-      display_modules(modules[battery].position);
+      display_modules(module->position);
       previous_battery_capacity = capacity;
     }
     fflush(fbat_cap);
     fflush(fbat_status);
     rewind(fbat_cap);
     rewind(fbat_status);
-    sleep(modules[battery].interval);
+    //sleep(module->interval); //TODO add interval in config
+    sleep(5);
   }
   fclose(fbat_cap);
   fclose(fbat_status);
-  free(modules[battery].string);
+  free(module->string);
   return NULL;
 }

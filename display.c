@@ -93,7 +93,6 @@ void *display_graphic_bar(void *) {
   while (1) {
     XNextEvent(display, &event);
     if (event.type == Expose) {
-      printf("event exposed\n");
       display_modules(LEFT);
       display_modules(CENTER);
       display_modules(RIGHT);
@@ -193,7 +192,7 @@ void display_modules(int position) {
   struct Module *current = head;
 
   while (current != NULL) {
-    if (current->string != NULL && current->string[0] != '\0' &&
+    if (current->string != NULL  &&
         current->position == position) {
       XftTextExtentsUtf8(display, font, (XftChar8 *)current->string,
                          strlen(current->string), &extents);

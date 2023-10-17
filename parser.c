@@ -74,6 +74,18 @@ static void parse_modules(cJSON *modules_json) {
       current->thread_function = date_update;
       strcpy(current->name, "date");
     }
+
+    // Battery module
+    else if (strcmp("battery", modules_json->string) == 0) {
+      struct Battery *options = (struct Battery *)malloc(sizeof(struct Battery));
+      char *battery = cJSON_GetObjectItemCaseSensitive(modules_json, "battery")->valuestring;
+      current->thread_function = battery_update;
+      options->battery = (char *)malloc(sizeof(char) * strlen(battery));
+      strcpy(options->battery, battery);
+      current->Module_infos = options;
+      strcpy(current->name, "battery");
+    }
+
     // Media module
     else if (strcmp("media", modules_json->string) == 0) {
       current->thread_function = media_update;
