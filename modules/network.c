@@ -101,7 +101,7 @@ void *wifi_update(void *arg) {
   struct nlmsghdr *nlh;
   ssize_t len;
 
-  while (1) {
+  while (running) {
     len = recv(fd, buffer, sizeof(buffer), 0);
     if (len < 0) {
       perror("recv");
