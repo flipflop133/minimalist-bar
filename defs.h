@@ -6,6 +6,17 @@ int remove_nl(char *str);
 void cleanup(int sig);
 extern void *launchModules(void *);
 
+
+char* retrieve_command_arg(char* arg);
+// Command line arguments are stored here
+extern struct Argument *argument_head;
+extern int args_count;
+struct Argument{
+  struct Argument *next;
+  char* name;
+  void* value;
+};
+
 // Modules positions
 enum positions { RIGHT, CENTER, LEFT };
 

@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "defs.h"
 #include <cjson/cJSON.h>
 #include <libgen.h>
 #include <stdio.h>
@@ -18,8 +19,16 @@ void parse_config(void) {
     printf("Failed to read config file path.");
     exit(1);
   }
-  char *directory = dirname(config_file_path);
-  strcat(directory, "/i3status.json");
+  printf("ok\n");
+  char* directory = retrieve_command_arg("--config");
+  printf("ko\n");
+  printf("%s\n", directory);
+  if(strlen(directory) == 0){
+    printf("directory len is 0\n");
+    directory = dirname(config_file_path);
+    strcat(directory, "/i3status.json");
+  }
+  
   config_file = fopen(directory, "r");
   if (config_file == NULL) {
     exit(1);

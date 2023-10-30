@@ -1,5 +1,4 @@
 {
-    "include": "i3status_light.json",
     "modules": {
         "date": {"format": "%a %d %I:%M"},
         "battery": {
@@ -18,8 +17,8 @@
         }
     },
     "general": {
-        "background-color": "#353535",
-        "foreground-color": "#eeeeec",
+        "background-color": "#eeeeec",
+        "foreground-color": "#353535",
         "workspace-color": "#15539e",
         "workspace-color-urgent": "#c01c28",
         "workspace-padding": 20,

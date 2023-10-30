@@ -13,14 +13,19 @@
 #include <stdio.h>
 #include <string.h>
 
+void parse_arguments(int argc, char *argv[]);
 DisplayOrder displayOrder;
 Options options;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 struct Module *head = NULL;
 int modules_count = 0;
 int running = 1;
+struct Argument *argument_head;
+int args_count;
 
-int main() {
+int main(int argc, char *argv[]) {
+  parse_arguments(argc, argv);
+  printf("done\n");
   parse_config();
   signal(SIGTERM, cleanup);
   signal(SIGINT, cleanup);
@@ -33,6 +38,41 @@ int main() {
   pthread_join(display_thread, NULL);
 
   return 0;
+}
+
+char* retrieve_command_arg(char* arg){
+  struct Argument* current = argument_head;
+  while(current != NULL){
+    if(strcmp(current->name, arg) == 0){
+      return current->value;
+    }
+    current = current-> next;
+  }
+  return "";
+}
+
+void parse_arguments(int argc, char *argv[]){
+  args_count = argc;
+  struct Argument* current = NULL;
+  struct Argument* previous = NULL;
+  int first = 1;
+  for(int i = 0; i < argc;i++){
+    current = (struct Argument*)malloc(sizeof(struct Argument));
+    current->name = (char*)malloc(sizeof(char)*strlen(argv[i]));
+    strcpy(current->name,  argv[i]);
+    if(strcmp(argv[i], "--config") == 0){
+      current->value = (char*)malloc(sizeof(char)*strlen(argv[++i]));
+      strcpy(current->value,  argv[i]); 
+    }
+    if(first){
+      first = 0;
+      argument_head = current;
+    }
+    else {
+      previous->next = current;
+    }
+    previous = current;
+  }
 }
 
 void *launchModules(void *) {
