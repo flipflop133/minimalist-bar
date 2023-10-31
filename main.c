@@ -25,7 +25,6 @@ int args_count;
 
 int main(int argc, char *argv[]) {
   parse_arguments(argc, argv);
-  printf("done\n");
   parse_config();
   signal(SIGTERM, cleanup);
   signal(SIGINT, cleanup);

@@ -16,7 +16,7 @@ SRC_FILES = \
     $(SRC_DIR)/volume.c
 
 OUT = minimalist_bar
-LIBRARIES = -lpulse -lbluetooth -I/usr/include -lcjson -I/usr/include/freetype2/ -lX11 -lXft
+LIBRARIES = -lpulse -lbluetooth -I/usr/include -lcjson -I/usr/include/freetype2/ -lX11 -lXft -lXrandr
 
 default: release
 

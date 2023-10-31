@@ -19,12 +19,8 @@ void parse_config(void) {
     printf("Failed to read config file path.");
     exit(1);
   }
-  printf("ok\n");
   char* directory = retrieve_command_arg("--config");
-  printf("ko\n");
-  printf("%s\n", directory);
   if(strlen(directory) == 0){
-    printf("directory len is 0\n");
     directory = dirname(config_file_path);
     strcat(directory, "/i3status.json");
   }

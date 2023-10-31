@@ -15,6 +15,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <X11/extensions/Xrandr.h>
 #include FT_FREETYPE_H
 
 #define BAR_NAME "minimalist_bar"
@@ -36,7 +37,7 @@ unsigned long hex_color_to_pixel(char *hex_color, int screen_num) {
   return color.pixel;
 }
 
-void *display_graphic_bar(void *) {
+void *display_graphic_bar(void*) {
   display = XOpenDisplay(NULL);
   screen_num = DefaultScreen(display);
   if (display == NULL) {
@@ -71,7 +72,7 @@ void *display_graphic_bar(void *) {
                   (unsigned char *)&net_wm_window_type_dock, 1);
 
   XMapWindow(display, window);
-  XEvent event;
+  
 
   gc = XCreateGC(display, window, 0, NULL);
 
@@ -90,13 +91,29 @@ void *display_graphic_bar(void *) {
   pthread_t modules_thread;
   pthread_create(&modules_thread, NULL, launchModules, NULL);
 
+  // Enable resolution changes detection
+  XRRSelectInput(display, RootWindow(display, screen_num), RRScreenChangeNotifyMask);
+
+  XEvent event;
+  int res_changed;
   while (1) {
+    res_changed = 0;
     XNextEvent(display, &event);
+    // Update bar display if resolution changes
+    if (XRRUpdateConfiguration(&event)){
+      printf("screen resolution changed.\n");
+      res_changed = 1;
+    }
     if (event.type == Expose) {
       display_modules(LEFT);
       display_modules(CENTER);
       display_modules(RIGHT);
-      display_workspaces();
+      if(!res_changed){
+        display_workspaces(); // TODO don't update here if resolution change as it crashes!
+      }
+      else{
+        //tell i3ipc we need an update!
+      }
     }
   }
   // Wait for i3 thread
@@ -123,9 +140,7 @@ void display_workspaces() {
   if(workspaces_init) {
     XClearArea(display, window, 0, 0, workspaces_width,
              DisplayHeight(display, screen_num), False);
-    
   }
-
 
   for (unsigned short i = 0; i < workspaces.size; i++) {
     if (workspaces.workspaces[i].num == 0) {
