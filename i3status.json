@@ -2,9 +2,6 @@
     "include": "i3status_light.json",
     "modules": {
         "date": {"format": "%a %d %I:%M"},
-        "battery": {
-            "battery": "BAT0"
-        },
         "network": {
             "interface": "wlan0"
         },

@@ -44,18 +44,19 @@ int connect_to_ipc_socket() {
 
 void send_ipc_message(int sockfd, int type, const char *payload) {
   i3_ipc_header_t header;
-  ssize_t len = strlen(payload);
 
   // Fill the header with appropriate values
   memcpy(header.magic, I3_IPC_MAGIC, sizeof(header.magic));
-  header.size = len;
+  header.size = payload != NULL ? strlen(payload) : 0;
   header.type = type;
 
   // Send the header
   write(sockfd, &header, sizeof(header));
 
   // Send the message content
-  write(sockfd, payload, len);
+  if(payload != NULL){
+    write(sockfd, payload, header.size);
+  }
 }
 
 void receive_ipc_response(int sockfd, int type) {
@@ -85,7 +86,7 @@ void *listen_to_i3(void *) {
   send_ipc_message(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE, "[ \"workspace\"]");
   while (1) {
     receive_ipc_response(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE);
-    send_ipc_message(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES, "");
+    send_ipc_message(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES, NULL);
     receive_ipc_response(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES);
     display_workspaces();
   }
