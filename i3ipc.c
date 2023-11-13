@@ -59,15 +59,14 @@ void send_ipc_message(int sockfd, int type, const char *payload) {
   }
 }
 
-void receive_ipc_response(int sockfd, int type) {
+int receive_ipc_response(int sockfd, int type) {
   i3_ipc_header_t header;
   ssize_t bytes_read;
 
   // Receive the header
   if ((bytes_read = read(sockfd, &header, sizeof(header))) != sizeof(header)) {
     perror("read");
-    close(sockfd);
-    exit(1);
+    return -1;
   }
   char buffer[header.size + 1];
 
@@ -77,6 +76,7 @@ void receive_ipc_response(int sockfd, int type) {
   if (type == I3_IPC_MESSAGE_TYPE_GET_WORKSPACES) {
     parse_i3_workspaces(buffer);
   }
+  return 0;
 }
 
 void *listen_to_i3(void *) {
@@ -85,10 +85,19 @@ void *listen_to_i3(void *) {
 
   send_ipc_message(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE, "[ \"workspace\"]");
   while (1) {
-    receive_ipc_response(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE);
-    send_ipc_message(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES, NULL);
-    receive_ipc_response(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES);
-    display_workspaces();
+    if(receive_ipc_response(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE) != -1){
+      send_ipc_message(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES, NULL);
+      receive_ipc_response(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES);
+      display_workspaces();
+    }
+    else{
+      // handle display changes. TODO: handle this in the right way, we lose connection to the socket on screen change and this should not happen
+      sleep(1);
+      close(sockfd);
+      sockfd = connect_to_ipc_socket();
+      sockfd_workspace = connect_to_ipc_socket();
+      send_ipc_message(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE, "[ \"workspace\"]");
+    }
   }
   close(sockfd);
   return 0;
