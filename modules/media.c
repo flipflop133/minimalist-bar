@@ -7,9 +7,7 @@
 
 void *media_update(void *arg) {
   struct Module *module = (struct Module *)arg;
-  pthread_mutex_lock(&mutex);
-  module->string = (char *)malloc((MEDIA_BUFFER + 1 * sizeof(char)));
-  pthread_mutex_unlock(&mutex);
+
   char command[COMMAND_BUFFER];
   sprintf(command,
           "playerctl -Fa metadata --format '{{trunc(artist,%d)}} - "

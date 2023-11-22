@@ -79,9 +79,6 @@ static char *convert_signal_to_icon(int signal) {
 void *wifi_update(void *arg) {
   int interface_type = ETHERNET;
   struct Module *module = (struct Module *)arg;
-  pthread_mutex_lock(&mutex);
-  module->string = (char *)malloc((NETWORK_BUFFER * sizeof(char)));
-  pthread_mutex_unlock(&mutex);
 
   // Determine interface type
   if(isWiFiInterface(((struct Network*)(module->Module_infos))->interface)){

@@ -30,11 +30,8 @@ bat_status batList[] = {
 
 void *battery_update(void *arg) {
   struct Module *module = (struct Module *)arg;
-  pthread_mutex_lock(&mutex);
-  module->string = (char *)malloc((BATTERY_BUFFER * sizeof(char)));
-  pthread_mutex_unlock(&mutex);
 
-  char bat_path[50];
+  char bat_path[50] = "\0";
   strcat(bat_path, BATTERY_PATH);
   strcat(bat_path, ((struct Battery*)module->Module_infos)->battery);
   FILE *fbat_cap;

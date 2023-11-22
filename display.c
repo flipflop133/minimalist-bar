@@ -205,12 +205,10 @@ void display_modules(int position) {
   // Display modules
   XGlyphInfo extents;
   struct Module *current = head;
-
   while (current != NULL) {
-    if (current->string != NULL  &&
-        current->position == position) {
+    if (current->position == position) {
       XftTextExtentsUtf8(display, font, (XftChar8 *)current->string,
-                         strlen(current->string), &extents);
+                         strlen(current->string), &extents); 
       switch (current->position) {
       case LEFT:
         xCoordinate_left = xCoordinate_left + options.module_left_padding;
@@ -237,7 +235,6 @@ void display_modules(int position) {
   modules_center_x = xCoordinate_center;
   XFlush(display);
   pthread_mutex_unlock(&mutex);
-  
 }
 
 void clearModuleArea(int x, int y, int width) {

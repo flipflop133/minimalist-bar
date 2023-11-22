@@ -9,17 +9,17 @@
 
 void *date_update(void *arg) {
   char previous_string[DATE_BUFFER] = "\0";
+  
   struct Module *module = (struct Module *)arg;
-  pthread_mutex_lock(&mutex);
-  module->string = (char *)malloc((DATE_BUFFER + 1 * sizeof(char)));
-  pthread_mutex_unlock(&mutex);
+
   while (running) {
     time_t t = time(&t);
     const struct tm *my_time_props = localtime(&t);
-    strftime(module->string, DATE_BUFFER, ((struct Date*)(module->Module_infos))->format, my_time_props);
 
+    strftime(module->string, DATE_BUFFER, ((struct Date*)(module->Module_infos))->format, my_time_props);
     // This avoid calling display_modules too much
-    if (strcmp(module->string, previous_string) != 0) {
+    int val = strcmp(module->string, previous_string);
+    if (val != 0) {
       display_modules(module->position);
     }
     strcpy(previous_string, module->string);

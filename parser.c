@@ -72,6 +72,8 @@ static void parse_modules(cJSON *modules_json) {
       strcpy(options->interface, interface);
       current->Module_infos = options;
       strcpy(current->name, "network");
+      current->string = (char *)malloc((NETWORK_BUFFER * sizeof(char)));
+      strcpy(current->string, "\0");
     }
 
     // Date module
@@ -85,6 +87,8 @@ static void parse_modules(cJSON *modules_json) {
       current->Module_infos = options;
       current->thread_function = date_update;
       strcpy(current->name, "date");
+      current->string = (char *)malloc((DATE_BUFFER * sizeof(char)));
+      strcpy(current->string, "\0");
     }
 
     // Battery module
@@ -98,6 +102,8 @@ static void parse_modules(cJSON *modules_json) {
       strcpy(options->battery, battery);
       current->Module_infos = options;
       strcpy(current->name, "battery");
+      current->string = (char *)malloc((BATTERY_BUFFER * sizeof(char)));
+      strcpy(current->string, "\0");
     }
 
     // Media module
@@ -111,22 +117,29 @@ static void parse_modules(cJSON *modules_json) {
       current->Module_infos = options;
       current->thread_function = media_update;
       strcpy(current->name, "media");
-
+      current->string = (char *)malloc((MEDIA_BUFFER * sizeof(char)));
+      strcpy(current->string, "\0");
     }
     // Bluetooth module
     else if (strcmp("bluetooth", modules_json->string) == 0) {
       current->thread_function = bluetooth_update;
       strcpy(current->name, "bluetooth");
+      current->string = (char *)malloc((BLUETOOTH_BUFFER * sizeof(char)));
+      strcpy(current->string, "\0");
     }
     // Volume module
     else if (strcmp("volume", modules_json->string) == 0) {
       current->thread_function = volume_update;
       strcpy(current->name, "volume");
+      current->string = (char *)malloc((VOLUME_BUFFER * sizeof(char)));
+      strcpy(current->string, "\0");
     }
     // Mic module
     else if (strcmp("mic", modules_json->string) == 0) {
       current->thread_function = mic_update;
       strcpy(current->name, "mic");
+      current->string = (char *)malloc((MIC_BUFFER * sizeof(char)));
+      strcpy(current->string, "\0");
     }
     // Unknow module
     else {

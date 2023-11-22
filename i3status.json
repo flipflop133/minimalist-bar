@@ -2,6 +2,9 @@
     "include": "i3status_light.json",
     "modules": {
         "date": {"format": "%a %d %I:%M"},
+        "battery": {
+            "battery": "BAT0"
+        },
         "network": {
             "interface": "wlan0"
         },
@@ -22,7 +25,7 @@
         "workspace-padding": 20,
         "right-padding": 10,
         "module-left-padding": 30,
-        "font-name": "JetBrainsMono Nerd Font",
+        "font-name": "JetBrainsMono NF",
         "font-size": 12,
         "bar-position": "bottom",
         "bar-height": 40

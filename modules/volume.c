@@ -105,9 +105,7 @@ static void source_info_callback(pa_context *, const pa_source_info *i, int,
 void *volume_update(void *arg) {
   struct Module *module = (struct Module *)arg;
   volume_module = module;
-  pthread_mutex_lock(&mutex);
-  module->string = (char *)malloc((VOLUME_BUFFER * sizeof(char)));
-  pthread_mutex_unlock(&mutex);
+
   pulse_loop(SINK, volume_loop);
   free(module->string);
   return NULL;
