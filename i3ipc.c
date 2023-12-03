@@ -66,7 +66,7 @@ void send_ipc_message(int sockfd, int type, const char *payload)
   }
 }
 
-int receive_ipc_response(int sockfd, int event)
+int receive_ipc_response(int sockfd)
 {
   i3_ipc_header_t header;
   ssize_t bytes_read;
@@ -84,19 +84,19 @@ int receive_ipc_response(int sockfd, int event)
   buffer[header.size] = '\0';
   int sockfd_workspace;
 
-  if (event)
+  if (header.type & (1UL << 31))
   {
     switch (header.type)
     {
     case I3_IPC_EVENT_WORKSPACE:
       sockfd_workspace = connect_to_ipc_socket();
       send_ipc_message(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES, NULL);
-      receive_ipc_response(sockfd_workspace, 0);
+      receive_ipc_response(sockfd_workspace);
       break;
     case I3_IPC_EVENT_MODE:
       sockfd_workspace = connect_to_ipc_socket();
       send_ipc_message(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_BINDING_STATE, NULL);
-      receive_ipc_response(sockfd_workspace, 0);
+      receive_ipc_response(sockfd_workspace);
       break;
     default:
       break;
@@ -131,11 +131,11 @@ void *listen_to_i3(void *)
   // Retrieve workspaces at least one time for initialisation
   int sockfd_workspace = connect_to_ipc_socket();
   send_ipc_message(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES, NULL);
-  receive_ipc_response(sockfd_workspace, 0);
+  receive_ipc_response(sockfd_workspace);
 
   while (1)
   {
-    int response = receive_ipc_response(sockfd, 1);
+    int response = receive_ipc_response(sockfd);
     if (response == -1)
     {
       // handle display changes. TODO: handle this in the right way, we lose connection to the socket on screen change and this should not happen
