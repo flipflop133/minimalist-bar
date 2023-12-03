@@ -12,20 +12,25 @@
 #include <unistd.h>
 
 static void parse_i3_workspaces(char *config);
+static void parse_i3_modes(char *config);
 
 Workspaces workspaces;
+int resize_mode;
 
-void retrieve_i3_socket_path(char *path) {
+void retrieve_i3_socket_path(char *path)
+{
   FILE *fp = popen("i3 --get-socketpath", "r");
 
-  if (fp != NULL) {
+  if (fp != NULL)
+  {
     fgets(path, 50, fp);
     path[strlen(path) - 1] = '\0';
     pclose(fp);
   }
 }
 
-int connect_to_ipc_socket() {
+int connect_to_ipc_socket()
+{
   int sockfd;
   struct sockaddr_un addr;
 
@@ -42,7 +47,8 @@ int connect_to_ipc_socket() {
   return sockfd;
 }
 
-void send_ipc_message(int sockfd, int type, const char *payload) {
+void send_ipc_message(int sockfd, int type, const char *payload)
+{
   i3_ipc_header_t header;
 
   // Fill the header with appropriate values
@@ -54,56 +60,97 @@ void send_ipc_message(int sockfd, int type, const char *payload) {
   write(sockfd, &header, sizeof(header));
 
   // Send the message content
-  if(payload != NULL){
+  if (payload != NULL)
+  {
     write(sockfd, payload, header.size);
   }
 }
 
-int receive_ipc_response(int sockfd, int type) {
+int receive_ipc_response(int sockfd, int event)
+{
   i3_ipc_header_t header;
   ssize_t bytes_read;
 
   // Receive the header
-  if ((bytes_read = read(sockfd, &header, sizeof(header))) != sizeof(header)) {
+  if ((bytes_read = read(sockfd, &header, sizeof(header))) != sizeof(header))
+  {
     perror("read");
     return -1;
   }
+
   char buffer[header.size + 1];
 
   read(sockfd, buffer, header.size);
-
   buffer[header.size] = '\0';
-  if (type == I3_IPC_MESSAGE_TYPE_GET_WORKSPACES) {
-    parse_i3_workspaces(buffer);
+  int sockfd_workspace;
+
+  if (event)
+  {
+    switch (header.type)
+    {
+    case I3_IPC_EVENT_WORKSPACE:
+      sockfd_workspace = connect_to_ipc_socket();
+      send_ipc_message(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES, NULL);
+      receive_ipc_response(sockfd_workspace, 0);
+      break;
+    case I3_IPC_EVENT_MODE:
+      sockfd_workspace = connect_to_ipc_socket();
+      send_ipc_message(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_BINDING_STATE, NULL);
+      receive_ipc_response(sockfd_workspace, 0);
+      break;
+    default:
+      break;
+    }
+  }
+  else
+  {
+    switch (header.type)
+    {
+    case I3_IPC_REPLY_TYPE_WORKSPACES:
+      parse_i3_workspaces(buffer);
+      display_workspaces();
+      break;
+
+    case I3_IPC_REPLY_TYPE_GET_BINDING_STATE:
+      parse_i3_modes(buffer);
+      display_workspaces();
+      break;
+    default:
+      break;
+    }
   }
   return 0;
 }
 
-void *listen_to_i3(void *) {
+void *listen_to_i3(void *)
+{
   int sockfd = connect_to_ipc_socket();
-  int sockfd_workspace = connect_to_ipc_socket();
 
-  send_ipc_message(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE, "[ \"workspace\"]");
-  while (1) {
-    if(receive_ipc_response(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE) != -1){
-      send_ipc_message(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES, NULL);
-      receive_ipc_response(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES);
-      display_workspaces();
-    }
-    else{
+  send_ipc_message(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE, "[ \"workspace\", \"mode\"]");
+
+  // Retrieve workspaces at least one time for initialisation
+  int sockfd_workspace = connect_to_ipc_socket();
+  send_ipc_message(sockfd_workspace, I3_IPC_MESSAGE_TYPE_GET_WORKSPACES, NULL);
+  receive_ipc_response(sockfd_workspace, 0);
+
+  while (1)
+  {
+    int response = receive_ipc_response(sockfd, 1);
+    if (response == -1)
+    {
       // handle display changes. TODO: handle this in the right way, we lose connection to the socket on screen change and this should not happen
       sleep(1);
       close(sockfd);
       sockfd = connect_to_ipc_socket();
-      sockfd_workspace = connect_to_ipc_socket();
-      send_ipc_message(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE, "[ \"workspace\"]");
+      send_ipc_message(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE, "[ \"workspace\", \"mode\"]");
     }
   }
   close(sockfd);
   return 0;
 }
 
-static void parse_i3_workspaces(char *config) {
+static void parse_i3_workspaces(char *config)
+{
   // Clean workspaces list
   free(workspaces.workspaces);
   workspaces.size = 0;
@@ -112,10 +159,11 @@ static void parse_i3_workspaces(char *config) {
   cJSON *json = cJSON_Parse(config);
   cJSON *workspace = NULL;
   unsigned short i = 0;
-  unsigned short  workspaces_number = 10;
-  
+  unsigned short workspaces_number = 10;
+
   workspaces.workspaces = malloc(workspaces_number * sizeof(Workspaces));
-  cJSON_ArrayForEach(workspace, json) {
+  cJSON_ArrayForEach(workspace, json)
+  {
     cJSON *num = cJSON_GetObjectItemCaseSensitive(workspace, "num");
     cJSON *visible = cJSON_GetObjectItemCaseSensitive(workspace, "visible");
     cJSON *urgent = cJSON_GetObjectItemCaseSensitive(workspace, "urgent");
@@ -123,11 +171,28 @@ static void parse_i3_workspaces(char *config) {
     workspaces.workspaces[i].visible = visible->valueint;
     workspaces.workspaces[i].urgent = urgent->valueint;
     i++;
-    if(i > workspaces_number){
+    if (i > workspaces_number)
+    {
       workspaces_number += 10;
       workspaces.workspaces = realloc(workspaces.workspaces, workspaces_number * sizeof(Workspaces));
     }
   }
   workspaces.size = i;
+  cJSON_Delete(json);
+}
+
+static void parse_i3_modes(char *config)
+{
+  // Parse json from config file
+  cJSON *json = cJSON_Parse(config);
+  cJSON *mode = cJSON_GetObjectItemCaseSensitive(json, "name");
+  if (!strcmp("resize", mode->valuestring))
+  {
+    resize_mode = 1;
+  }
+  else
+  {
+    resize_mode = 0;
+  }
   cJSON_Delete(json);
 }

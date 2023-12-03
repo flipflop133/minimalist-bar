@@ -19,6 +19,7 @@
 #include FT_FREETYPE_H
 
 #define BAR_NAME "minimalist_bar"
+#define RESIZE_MODE_STRING "resize"
 Display *display;
 int screen_num;
 GC gc;
@@ -29,7 +30,8 @@ XftColor xftColor;
 int yFontCoordinate;
 void drawModuleString(int x, int y, char *string);
 void clearModuleArea(int x, int y, int width);
-unsigned long hex_color_to_pixel(char *hex_color, int screen_num) {
+unsigned long hex_color_to_pixel(char *hex_color, int screen_num)
+{
   XColor color;
   Colormap colormap = DefaultColormap(display, screen_num);
   XParseColor(display, colormap, hex_color, &color);
@@ -37,10 +39,12 @@ unsigned long hex_color_to_pixel(char *hex_color, int screen_num) {
   return color.pixel;
 }
 
-void *display_graphic_bar(void*) {
+void *display_graphic_bar(void *)
+{
   display = XOpenDisplay(NULL);
   screen_num = DefaultScreen(display);
-  if (display == NULL) {
+  if (display == NULL)
+  {
     fprintf(stderr, "Unable to open X display\n");
     exit(1);
   }
@@ -72,7 +76,6 @@ void *display_graphic_bar(void*) {
                   (unsigned char *)&net_wm_window_type_dock, 1);
 
   XMapWindow(display, window);
-  
 
   gc = XCreateGC(display, window, 0, NULL);
 
@@ -96,23 +99,28 @@ void *display_graphic_bar(void*) {
 
   XEvent event;
   int res_changed;
-  while (1) {
+  while (1)
+  {
     res_changed = 0;
     XNextEvent(display, &event);
     // Update bar display if resolution changes
-    if (XRRUpdateConfiguration(&event)){
+    if (XRRUpdateConfiguration(&event))
+    {
       printf("screen resolution changed.\n");
       res_changed = 1;
     }
-    if (event.type == Expose) {
+    if (event.type == Expose)
+    {
       display_modules(LEFT);
       display_modules(CENTER);
       display_modules(RIGHT);
-      if(!res_changed){
+      if (!res_changed)
+      {
         display_workspaces(); // TODO don't update here if resolution change as it crashes!
       }
-      else{
-        //tell i3ipc we need an update!
+      else
+      {
+        // tell i3ipc we need an update!
       }
     }
   }
@@ -128,22 +136,25 @@ void *display_graphic_bar(void*) {
 }
 
 int workspaces_width = 0;
-
 // Needed because if we use XClearArea with workspaces_width = 0, we clear the
 // whole bar including the modules!
 int workspaces_init = 0;
-void display_workspaces() {
+void display_workspaces()
+{
   int workspace_padding = options.workspace_padding;
   int padding = 20;
   int xCoordinate = workspace_padding / 2;
   XGlyphInfo extents;
-  if(workspaces_init) {
+  if (workspaces_init)
+  {
     XClearArea(display, window, 0, 0, workspaces_width,
-             DisplayHeight(display, screen_num), False);
+               DisplayHeight(display, screen_num), False);
   }
 
-  for (unsigned short i = 0; i < workspaces.size; i++) {
-    if (workspaces.workspaces[i].num == 0) {
+  for (unsigned short i = 0; i < workspaces.size; i++)
+  {
+    if (workspaces.workspaces[i].num == 0)
+    {
       break;
     }
     char str[workspaces.workspaces[i].num];
@@ -151,7 +162,8 @@ void display_workspaces() {
     sprintf(str, "%d", workspaces.workspaces[i].num);
     XftTextExtentsUtf8(display, font, (XftChar8 *)str, strlen(str), &extents);
 
-    if (workspaces.workspaces[i].urgent || workspaces.workspaces[i].visible) {
+    if (workspaces.workspaces[i].urgent || workspaces.workspaces[i].visible)
+    {
       char *color = workspaces.workspaces[i].urgent
                         ? options.workspace_color_urgent
                         : options.workspace_color;
@@ -161,6 +173,14 @@ void display_workspaces() {
     }
     XftDrawStringUtf8(xftDraw, &xftColor, font, xCoordinate, yFontCoordinate,
                       (const unsigned char *)str, strlen(str));
+    xCoordinate = xCoordinate + extents.xOff + padding;
+  }
+  if (resize_mode)
+  {
+    XftTextExtentsUtf8(display, font, (XftChar8 *)RESIZE_MODE_STRING, strlen(RESIZE_MODE_STRING), &extents);
+
+    XftDrawStringUtf8(xftDraw, &xftColor, font, xCoordinate, yFontCoordinate,
+                      (const unsigned char *)RESIZE_MODE_STRING, strlen(RESIZE_MODE_STRING));
     xCoordinate = xCoordinate + extents.xOff + padding;
   }
   workspaces_width = xCoordinate;
@@ -174,9 +194,11 @@ int modules_center_x = 0;
 int modules_center_width = 0;
 int modules_left_x = 0;
 int modules_left_width = 0;
-void display_modules(int position) {
+void display_modules(int position)
+{
   pthread_mutex_lock(&mutex);
-  if (display == NULL || font == NULL || xftDraw == NULL) {
+  if (display == NULL || font == NULL || xftDraw == NULL)
+  {
     return;
   }
 
@@ -184,7 +206,8 @@ void display_modules(int position) {
   int xCoordinate_center = modules_center_x;
   int xCoordinate_right = modules_right_x;
   // Clear modules area
-  switch (position) {
+  switch (position)
+  {
   case LEFT:
     clearModuleArea(modules_left_x, 0, modules_left_width);
     xCoordinate_left = workspaces_width;
@@ -205,11 +228,14 @@ void display_modules(int position) {
   // Display modules
   XGlyphInfo extents;
   struct Module *current = head;
-  while (current != NULL) {
-    if (current->position == position) {
+  while (current != NULL)
+  {
+    if (current->position == position)
+    {
       XftTextExtentsUtf8(display, font, (XftChar8 *)current->string,
-                         strlen(current->string), &extents); 
-      switch (current->position) {
+                         strlen(current->string), &extents);
+      switch (current->position)
+      {
       case LEFT:
         xCoordinate_left = xCoordinate_left + options.module_left_padding;
         drawModuleString(xCoordinate_left, yFontCoordinate, current->string);
@@ -237,14 +263,17 @@ void display_modules(int position) {
   pthread_mutex_unlock(&mutex);
 }
 
-void clearModuleArea(int x, int y, int width) {
-  if (width != 0) {
+void clearModuleArea(int x, int y, int width)
+{
+  if (width != 0)
+  {
     XClearArea(display, window, x, y, width, DisplayHeight(display, screen_num),
                False);
   }
 }
 
-void drawModuleString(int x, int y, char *string) {
+void drawModuleString(int x, int y, char *string)
+{
   XftDrawStringUtf8(xftDraw, &xftColor, font, x, y, (const FcChar8 *)string,
                     strlen(string));
 }
