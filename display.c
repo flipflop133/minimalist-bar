@@ -27,6 +27,7 @@ Window window;
 XftFont *font;
 XftDraw *xftDraw;
 XftColor xftColor;
+XftColor workspace_foreground_color;
 int yFontCoordinate;
 void drawModuleString(int x, int y, char *string);
 void clearModuleArea(int x, int y, int width);
@@ -89,6 +90,9 @@ void *display_graphic_bar(void *)
   XftColorAllocName(display, DefaultVisual(display, DefaultScreen(display)),
                     DefaultColormap(display, DefaultScreen(display)),
                     options.foreground_color, &xftColor);
+  XftColorAllocName(display, DefaultVisual(display, DefaultScreen(display)),
+                    DefaultColormap(display, DefaultScreen(display)),
+                    options.workspace_foreground_color, &workspace_foreground_color);
   yFontCoordinate = (options.bar_height + font->ascent - font->descent) / 2;
   // Start modules thread
   pthread_t modules_thread;
@@ -128,6 +132,8 @@ void *display_graphic_bar(void *)
   pthread_join(modules_thread, NULL);
   XftColorFree(display, DefaultVisual(display, DefaultScreen(display)),
                DefaultColormap(display, DefaultScreen(display)), &xftColor);
+  XftColorFree(display, DefaultVisual(display, DefaultScreen(display)),
+               DefaultColormap(display, DefaultScreen(display)), &workspace_foreground_color);
   XftFontClose(display, font);
   XftDrawDestroy(xftDraw);
   XDestroyWindow(display, window);
@@ -162,6 +168,7 @@ void display_workspaces()
     sprintf(str, "%d", workspaces.workspaces[i].num);
     XftTextExtentsUtf8(display, font, (XftChar8 *)str, strlen(str), &extents);
 
+    XftColor text_color = xftColor;
     if (workspaces.workspaces[i].urgent || workspaces.workspaces[i].visible)
     {
       char *color = workspaces.workspaces[i].urgent
@@ -170,8 +177,9 @@ void display_workspaces()
       XSetForeground(display, gc, hex_color_to_pixel(color, screen_num));
       XFillRectangle(display, window, gc, xCoordinate - workspace_padding / 2,
                      0, extents.xOff + workspace_padding, options.bar_height);
+      text_color = workspace_foreground_color;
     }
-    XftDrawStringUtf8(xftDraw, &xftColor, font, xCoordinate, yFontCoordinate,
+    XftDrawStringUtf8(xftDraw, &text_color, font, xCoordinate, yFontCoordinate,
                       (const unsigned char *)str, strlen(str));
     xCoordinate = xCoordinate + extents.xOff + padding;
   }

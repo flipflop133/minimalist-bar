@@ -9,7 +9,7 @@
 #include <pwd.h>
 static void parse_modules(cJSON *modules_json);
 static void parse_options(cJSON *json);
-#define CONFIG_PATH "/.config/minimalist-bar/config.json"
+
 void parse_config(void)
 {
   // Read config file
@@ -217,6 +217,9 @@ static void parse_options(cJSON *json)
               ->valuestring));
   strcpy(options.workspace_color,
          (cJSON_GetObjectItemCaseSensitive(options_json, "workspace-color")
+              ->valuestring));
+  strcpy(options.workspace_foreground_color,
+         (cJSON_GetObjectItemCaseSensitive(options_json, "workspace-foreground-color")
               ->valuestring));
   strcpy(
       options.workspace_color_urgent,
