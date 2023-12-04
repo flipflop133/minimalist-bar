@@ -23,7 +23,8 @@ int running = 1;
 struct Argument *argument_head;
 int args_count;
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
   parse_arguments(argc, argv);
   parse_config();
   signal(SIGTERM, cleanup);
@@ -39,42 +40,51 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-char* retrieve_command_arg(char* arg){
-  struct Argument* current = argument_head;
-  while(current != NULL){
-    if(strcmp(current->name, arg) == 0){
+char *retrieve_command_arg(char *arg)
+{
+  struct Argument *current = argument_head;
+  while (current != NULL)
+  {
+    if (strcmp(current->name, arg) == 0)
+    {
       return current->value;
     }
-    current = current-> next;
+    current = current->next;
   }
-  return "";
+  return NULL;
 }
 
-void parse_arguments(int argc, char *argv[]){
+void parse_arguments(int argc, char *argv[])
+{
   args_count = argc;
-  struct Argument* current = NULL;
-  struct Argument* previous = NULL;
+  struct Argument *current = NULL;
+  struct Argument *previous = NULL;
   int first = 1;
-  for(int i = 0; i < argc;i++){
-    current = (struct Argument*)malloc(sizeof(struct Argument));
-    current->name = (char*)malloc(sizeof(char)*strlen(argv[i]));
-    strcpy(current->name,  argv[i]);
-    if(strcmp(argv[i], "--config") == 0){
-      current->value = (char*)malloc(sizeof(char)*strlen(argv[++i]));
-      strcpy(current->value,  argv[i]); 
+  for (int i = 0; i < argc; i++)
+  {
+    current = (struct Argument *)malloc(sizeof(struct Argument));
+    current->name = (char *)malloc(sizeof(char) * strlen(argv[i]));
+    strcpy(current->name, argv[i]);
+    if (strcmp(argv[i], "--config") == 0)
+    {
+      current->value = (char *)malloc(sizeof(char) * strlen(argv[++i]));
+      strcpy(current->value, argv[i]);
     }
-    if(first){
+    if (first)
+    {
       first = 0;
       argument_head = current;
     }
-    else {
+    else
+    {
       previous->next = current;
     }
     previous = current;
   }
 }
 
-void *launchModules(void *) {
+void *launchModules(void *)
+{
   // Start i3 thread
   pthread_t i3_thread;
   pthread_create(&i3_thread, NULL, listen_to_i3, NULL);
@@ -83,14 +93,16 @@ void *launchModules(void *) {
   pthread_t threads[modules_count];
   struct Module *current = head;
   int i = 0;
-  while (current != NULL) {
+  while (current != NULL)
+  {
     pthread_create(&threads[i], NULL, current->thread_function, current);
     current = current->next;
     i++;
   }
 
   // Wait for modules threads
-  for (int i = 0; i < modules_count; ++i) {
+  for (int i = 0; i < modules_count; ++i)
+  {
     pthread_join(threads[i], NULL);
   }
 
@@ -100,15 +112,19 @@ void *launchModules(void *) {
   return NULL;
 }
 
-void cleanup(int) {
+void cleanup(int)
+{
   running = 0;
   pa_mainloop_quit(volume_loop, 0);
   pa_mainloop_quit(mic_loop, 0);
 }
 
-int remove_nl(char *str) {
-  for (int i = 0; str[i] != '\0'; i++) {
-    if (str[i] == '\n') {
+int remove_nl(char *str)
+{
+  for (int i = 0; str[i] != '\0'; i++)
+  {
+    if (str[i] == '\n')
+    {
       str[i] = '\0';
       return 0;
     }
