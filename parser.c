@@ -28,11 +28,13 @@ void parse_config(void)
   }
 
   config_file = fopen(config_file_path, "r");
-  free(config_file_path);
+
   if (config_file == NULL)
   {
+    printf("Can't read %s, make sure the file exists.\n", config_file_path);
     exit(1);
   }
+  free(config_file_path);
   char buf[1024] = {'\0'};
   while (fgets(buf, sizeof(buf), config_file))
   {
