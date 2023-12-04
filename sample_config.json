@@ -20,6 +20,7 @@
         "background-color": "#eeeeec",
         "foreground-color": "#353535",
         "workspace-color": "#15539e",
+        "workspace-foreground-color": "#eeeeec",
         "workspace-color-urgent": "#c01c28",
         "workspace-padding": 20,
         "right-padding": 10,
