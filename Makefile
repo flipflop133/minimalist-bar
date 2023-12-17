@@ -1,6 +1,6 @@
 CC = cc
 DEBUG_FLAGS = -g -Wall -Wextra
-RELEASE_FLAGS = -O3
+RELEASE_FLAGS = -O3 -flto
 
 SRC_DIR = modules
 SRC_FILES = \

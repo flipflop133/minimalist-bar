@@ -10,6 +10,28 @@
 static void parse_modules(cJSON *modules_json);
 static void parse_options(cJSON *json);
 
+struct Config_files
+{
+  char *strings[256];
+  int used;
+} config_files;
+
+void addPath(struct Config_files *config, const char *path)
+{
+  config->strings[config->used] = strdup(path);
+  strcat(config->strings[config->used], "\0");
+  config->used++;
+}
+
+void freePaths(struct Config_files *config)
+{
+  for (int i = 0; i < config->used; ++i)
+  {
+    free(config->strings[i]);
+  }
+  config->used = 0;
+}
+
 void parse_config(void)
 {
   // Read config file
@@ -17,6 +39,7 @@ void parse_config(void)
   FILE *config_file;
   char *config_file_path = retrieve_command_arg("--config");
 
+  // If config file was not given as an argument, read it from default path.
   if (config_file_path == NULL)
   {
     struct passwd *info = getpwuid(1000);
@@ -34,7 +57,8 @@ void parse_config(void)
     printf("Can't read %s, make sure the file exists.\n", config_file_path);
     exit(1);
   }
-  free(config_file_path);
+
+  // Read base config file
   char buf[1024] = {'\0'};
   while (fgets(buf, sizeof(buf), config_file))
   {
@@ -42,22 +66,71 @@ void parse_config(void)
   }
   fclose(config_file);
 
+  addPath(&config_files, config);
+
   // Parse json from config file
   cJSON *json = cJSON_Parse(config);
-  cJSON *modules_json =
-      cJSON_GetObjectItemCaseSensitive(json, "modules")->child;
-  int number_of_modules = 0;
-  cJSON *tmp = modules_json;
-  while (tmp != NULL)
+  cJSON *include_json =
+      cJSON_GetObjectItemCaseSensitive(json, "include");
+  if (include_json != NULL)
   {
-    tmp = tmp->next;
-    number_of_modules++;
-  }
-  displayOrder.list = (int *)malloc(sizeof(int) * number_of_modules);
+    // Retrieve directory from config file path
+    const char *lastSlash = strrchr(config_file_path, '/');
+    size_t pathLength = lastSlash - config_file_path + 1;
+    char directoryPath[pathLength + 1];
+    strncpy(directoryPath, config_file_path, pathLength);
+    directoryPath[pathLength] = '\0';
 
-  parse_modules(modules_json);
-  parse_options(json);
-  cJSON_Delete(json);
+    strcat(directoryPath, include_json->valuestring);
+
+    config_file = fopen(directoryPath, "r");
+    if (config_file == NULL)
+    {
+      printf("Can't read included file %s, make sure the file exists.\n", directoryPath);
+      exit(1);
+    }
+    // Read included config file
+    char buf[1024] = {'\0'};
+    char included_config[1024] = {'\0'};
+    while (fgets(buf, sizeof(buf), config_file))
+    {
+      strcat(included_config, buf);
+    }
+    addPath(&config_files, included_config);
+    fclose(config_file);
+  }
+  free(config_file_path);
+  for (int i = 0; i < config_files.used; i++)
+  {
+    json = cJSON_Parse(config_files.strings[i]);
+    // Parse modules
+    cJSON *modules_json = cJSON_GetObjectItemCaseSensitive(json, "modules");
+
+    if (modules_json != NULL)
+    {
+      modules_json = modules_json->child;
+      int number_of_modules = 0;
+      cJSON *tmp = modules_json;
+      while (tmp != NULL)
+      {
+        tmp = tmp->next;
+        number_of_modules++;
+      }
+      displayOrder.list = (int *)malloc(sizeof(int) * number_of_modules);
+
+      parse_modules(modules_json);
+    }
+
+    // Parse config options
+    cJSON *options_json = cJSON_GetObjectItemCaseSensitive(json, "general");
+    if (options_json != NULL)
+    {
+      parse_options(options_json);
+    }
+    cJSON_Delete(json);
+  }
+
+  freePaths(&config_files);
 }
 
 static void parse_modules(cJSON *modules_json)
@@ -205,11 +278,9 @@ static void parse_modules(cJSON *modules_json)
   }
 }
 
-// TODO remove redunduncy of this function
-static void parse_options(cJSON *json)
+// TODO remove redundancy of this function
+static void parse_options(cJSON *options_json)
 {
-  // Parse config options
-  cJSON *options_json = cJSON_GetObjectItemCaseSensitive(json, "general");
   // Colors
   strcpy(options.background_color,
          (cJSON_GetObjectItemCaseSensitive(options_json, "background-color")

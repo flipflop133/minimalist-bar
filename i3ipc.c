@@ -16,21 +16,33 @@ static void parse_i3_modes(char *config);
 
 Workspaces workspaces;
 int resize_mode;
+char *socket_path = NULL;
 
-void retrieve_i3_socket_path(char *path)
+int retrieve_i3_sock_path()
 {
-  FILE *fp = popen("i3 --get-socketpath", "r");
-
-  if (fp != NULL)
+  while (1)
   {
-    fgets(path, 50, fp);
-    path[strlen(path) - 1] = '\0';
-    pclose(fp);
+    FILE *fp = popen("i3 --get-socketpath", "r");
+    if (fp != NULL)
+    {
+      socket_path = malloc(50);
+      fgets(socket_path, 50, fp);
+      if (strlen(socket_path) == 0)
+      {
+        continue;
+      }
+      socket_path[strlen(socket_path) - 1] = '\0';
+      pclose(fp);
+      return 0;
+    }
+    usleep(100000);
   }
+  return -1;
 }
 
 int connect_to_ipc_socket()
 {
+
   int sockfd;
   struct sockaddr_un addr;
 
@@ -38,10 +50,8 @@ int connect_to_ipc_socket()
 
   memset(&addr, 0, sizeof(addr));
   addr.sun_family = AF_UNIX;
-  char path[50];
-  retrieve_i3_socket_path(path);
-  strncpy(addr.sun_path, path, sizeof(addr.sun_path) - 1);
 
+  strncpy(addr.sun_path, socket_path, sizeof(addr.sun_path) - 1);
   connect(sockfd, (struct sockaddr *)&addr, sizeof(addr));
 
   return sockfd;
@@ -124,6 +134,9 @@ int receive_ipc_response(int sockfd)
 
 void *listen_to_i3(void *)
 {
+  retrieve_i3_sock_path();
+  printf("%s\n", socket_path);
+
   int sockfd = connect_to_ipc_socket();
 
   send_ipc_message(sockfd, I3_IPC_MESSAGE_TYPE_SUBSCRIBE, "[ \"workspace\", \"mode\"]");
