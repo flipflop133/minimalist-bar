@@ -34,74 +34,101 @@ void freePaths(struct Config_files *config)
 
 void parse_config(void)
 {
-  // Read config file
-  char config[4096] = {'\0'};
   FILE *config_file;
   char *config_file_path = retrieve_command_arg("--config");
-
   // If config file was not given as an argument, read it from default path.
   if (config_file_path == NULL)
   {
+    free(config_file_path);
+    printf("config file path is null\n");
     struct passwd *info = getpwuid(1000);
     config_file_path = malloc(
-        sizeof(info->pw_dir) * sizeof(char) +
-        sizeof(CONFIG_PATH) * sizeof(char));
+        strlen(info->pw_dir) +
+        strlen(CONFIG_PATH) + 1);
     strcpy(config_file_path, info->pw_dir);
     strcat(config_file_path, CONFIG_PATH);
   }
-
-  config_file = fopen(config_file_path, "r");
+  config_file = fopen(config_file_path, "rb");
 
   if (config_file == NULL)
   {
+    perror("Error");
     printf("Can't read %s, make sure the file exists.\n", config_file_path);
     exit(1);
   }
 
   // Read base config file
-  char buf[1024] = {'\0'};
-  while (fgets(buf, sizeof(buf), config_file))
-  {
-    strcat(config, buf);
-  }
-  fclose(config_file);
+
+  fseek(config_file, 0, SEEK_END);
+  long file_size = ftell(config_file);
+  rewind(config_file);
+  char *config = (char *)malloc(file_size + 1);
+  fread(config, 1, file_size, config_file);
+  config[file_size] = '\0';
 
   addPath(&config_files, config);
-
+  fclose(config_file);
   // Parse json from config file
   cJSON *json = cJSON_Parse(config);
-  cJSON *include_json =
-      cJSON_GetObjectItemCaseSensitive(json, "include");
+  cJSON *include_json = cJSON_GetObjectItemCaseSensitive(json, "include");
   if (include_json != NULL)
   {
-    // Retrieve directory from config file path
+    // Retrieve directory path from config file path
     const char *lastSlash = strrchr(config_file_path, '/');
     size_t pathLength = lastSlash - config_file_path + 1;
     char directoryPath[pathLength + 1];
     strncpy(directoryPath, config_file_path, pathLength);
     directoryPath[pathLength] = '\0';
 
-    strcat(directoryPath, include_json->valuestring);
+    char *directoryPathCopy;
+    directoryPathCopy = malloc(sizeof(directoryPath) + strlen(include_json->valuestring) + 1);
+    strcpy(directoryPathCopy, directoryPath);
+    printf("%s\n", include_json->valuestring);
+    strcat(directoryPathCopy, include_json->valuestring);
 
-    config_file = fopen(directoryPath, "r");
-    if (config_file == NULL)
+    // Loop as long a we find an include directive in the included files
+    while (1)
     {
-      printf("Can't read included file %s, make sure the file exists.\n", directoryPath);
-      exit(1);
+      printf("reading included config file\n");
+      config_file = fopen(directoryPathCopy, "rb");
+      printf("opening: %s\n", directoryPathCopy);
+      if (config_file == NULL)
+      {
+        printf("Can't read included file %s, make sure the file exists.\n", directoryPathCopy);
+        exit(1);
+      }
+      // Read included config file
+      printf("ok all fine\n");
+      fseek(config_file, 0, SEEK_END);
+      printf("ok sir\n");
+      long file_size = ftell(config_file);
+      rewind(config_file);
+      char *included_config = (char *)malloc(file_size + 1);
+      fread(included_config, 1, file_size, config_file);
+      included_config[file_size] = '\0';
+
+      addPath(&config_files, included_config);
+      fclose(config_file);
+
+      // Check if there is also an included config file
+      json = cJSON_Parse(included_config);
+      free(included_config);
+      include_json = cJSON_GetObjectItemCaseSensitive(json, "include");
+      if (include_json == NULL)
+      {
+        break;
+      }
+      free(directoryPathCopy);
+      directoryPathCopy = malloc(sizeof(directoryPath) + strlen(include_json->valuestring) + 1);
+      strcpy(directoryPathCopy, directoryPath);
+      strcat(directoryPathCopy, include_json->valuestring);
     }
-    // Read included config file
-    char buf[1024] = {'\0'};
-    char included_config[1024] = {'\0'};
-    while (fgets(buf, sizeof(buf), config_file))
-    {
-      strcat(included_config, buf);
-    }
-    addPath(&config_files, included_config);
-    fclose(config_file);
+    free(directoryPathCopy);
   }
   free(config_file_path);
   for (int i = 0; i < config_files.used; i++)
   {
+    printf("%s\n", config_files.strings[i]);
     json = cJSON_Parse(config_files.strings[i]);
     // Parse modules
     cJSON *modules_json = cJSON_GetObjectItemCaseSensitive(json, "modules");
@@ -131,6 +158,7 @@ void parse_config(void)
   }
 
   freePaths(&config_files);
+  printf("parsing done\n");
 }
 
 static void parse_modules(cJSON *modules_json)
@@ -152,7 +180,7 @@ static void parse_modules(cJSON *modules_json)
       char *interface =
           cJSON_GetObjectItemCaseSensitive(modules_json, "interface")
               ->valuestring;
-      options->interface = (char *)malloc(sizeof(char) * strlen(interface));
+      options->interface = (char *)malloc(sizeof(char) * strlen(interface) + 1);
       strcpy(options->interface, interface);
       current->Module_infos = options;
       strcpy(current->name, "network");
@@ -167,12 +195,12 @@ static void parse_modules(cJSON *modules_json)
       char *format =
           cJSON_GetObjectItemCaseSensitive(modules_json, "format")
               ->valuestring;
-      options->format = (char *)malloc(sizeof(char) * strlen(format));
+      options->format = malloc(sizeof(char) * strlen(format) + 1);
       strcpy(options->format, format);
       current->Module_infos = options;
       current->thread_function = date_update;
       strcpy(current->name, "date");
-      current->string = (char *)malloc((DATE_BUFFER * sizeof(char)));
+      current->string = malloc((DATE_BUFFER));
       strcpy(current->string, "\0");
     }
 
@@ -184,11 +212,11 @@ static void parse_modules(cJSON *modules_json)
       char *battery = cJSON_GetObjectItemCaseSensitive(modules_json, "battery")
                           ->valuestring;
       current->thread_function = battery_update;
-      options->battery = (char *)malloc(sizeof(char) * strlen(battery));
+      options->battery = malloc(strlen(battery) + 1);
       strcpy(options->battery, battery);
       current->Module_infos = options;
       strcpy(current->name, "battery");
-      current->string = (char *)malloc((BATTERY_BUFFER * sizeof(char)));
+      current->string = malloc((BATTERY_BUFFER));
       strcpy(current->string, "\0");
     }
 
@@ -301,7 +329,7 @@ static void parse_options(cJSON *options_json)
   // Font
   char *font_name =
       cJSON_GetObjectItemCaseSensitive(options_json, "font-name")->valuestring;
-  options.font_name = malloc(sizeof(char) * strlen(font_name));
+  options.font_name = malloc(sizeof(char) * strlen(font_name) + 1);
   strcpy(options.font_name, font_name);
   options.font_size =
       cJSON_GetObjectItemCaseSensitive(options_json, "font-size")->valueint;

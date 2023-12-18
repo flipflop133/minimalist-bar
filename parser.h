@@ -8,5 +8,5 @@
 #include "modules/network.h"
 #include "modules/volume.h"
 void parse_config(void);
-#define CONFIG_PATH "/.config/minimalist-bar/config.json"
+#define CONFIG_PATH "/.config/minimalist-bar/laptop_config.json"
 #endif

@@ -63,11 +63,15 @@ void parse_arguments(int argc, char *argv[])
   for (int i = 0; i < argc; i++)
   {
     current = (struct Argument *)malloc(sizeof(struct Argument));
-    current->name = (char *)malloc(sizeof(char) * strlen(argv[i]));
+    current->name = NULL;
+    current->value = NULL;
+    current->next = NULL;
+
+    current->name = malloc(strlen(argv[i]) + 1);
     strcpy(current->name, argv[i]);
     if (strcmp(argv[i], "--config") == 0)
     {
-      current->value = (char *)malloc(sizeof(char) * strlen(argv[++i]));
+      current->value = malloc(strlen(argv[++i]) + 1);
       strcpy(current->value, argv[i]);
     }
     if (first)
