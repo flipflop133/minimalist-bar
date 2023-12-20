@@ -1,15 +1,28 @@
 # Minimalist Bar
 ## Building
+### Install dependencies
+#### Arch
+```bash
+pacman -S cjson i3-wm xorg-server
+```
+#### Ubuntu
+```bash
+sudo apt-get update
+```
+```bash
+sudo apt-get install -y libpulse-dev libx11-dev libxft-dev libcjson-dev libbluetooth-dev libfreetype6-dev i3-wm libxrandr-dev xserver-xorg-dev
+```
+### Build the project
 Building release build:
-```bash 
+```bash
 ./build.sh
 ```
 Building debug build:
-```bash 
+```bash
 ./build.sh debug
 ```
 Cleaning:
-```bash 
+```bash
 ./build.sh clean
 ```
 ## TODO (sorted by priority)
