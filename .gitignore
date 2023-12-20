@@ -12,3 +12,6 @@
 
 # Ignore vscode dir
 .vscode/
+
+# Ignore CMAKE build directory
+build/
