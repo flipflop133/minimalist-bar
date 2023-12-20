@@ -1,5 +1,7 @@
 # Minimalist Bar
 
+![Bar preview](preview.png)
+
 ## Building
 
 ### Install dependencies
@@ -46,8 +48,8 @@ Cleaning:
 - [ ] add a xwindow module (to display windows name on the left)
 - [ ] allow empty config file, so use default values
 - [ ] allow missing config file options
-- [ ] read config file path from program arguments
-- [ ] create wiki to explain at least the config file
+- [x] read config file path from program arguments
+- [x] create wiki to explain at least the config file
 
 ## Stuff to add
 
