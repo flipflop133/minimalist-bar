@@ -1,5 +1,17 @@
 # Minimalist Bar
-
+## Building
+Building release build:
+```bash 
+./build.sh
+```
+Building debug build:
+```bash 
+./build.sh debug
+```
+Cleaning:
+```bash 
+./build.sh clean
+```
 ## TODO (sorted by priority)
 
 - [ ] put all magic values in config file (see TODO in code)
