@@ -1,4 +1,4 @@
-# Minimalist Bar
+# Minimalist Bar [![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/flipflop133/minimalist-bar/makefile.yml)](https://github.com/flipflop133/minimalist-bar/actions)
 
 ![Bar preview](preview.png)
 
