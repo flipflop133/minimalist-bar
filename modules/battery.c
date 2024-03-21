@@ -59,10 +59,9 @@ void *battery_update(void *arg) {
     fgets(bat_status, sizeof(bat_status), fbat_status);
     int capacity = atoi(bat_cap);
     if (capacity != previous_battery_capacity) {
-
       remove_nl(bat_status);
       if (strcmp(bat_status, "Charging")) {
-        for (int i = 0; i < (int)(sizeof(batList) / (sizeof(bat_status)));
+        for (int i = 0; i < (int)(sizeof(batList) / (sizeof(batList[0])));
              i++) {
           if (capacity > batList[i].capacity_threshold) {
             sprintf(module->string, "%s %d%%", batList[i].icon,
