@@ -34,6 +34,7 @@ target_link_libraries(minimalist_bar PRIVATE
     X11
     Xft
     Xrandr
+    Xinerama
 )
 
 # Set compiler flags for release build

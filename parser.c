@@ -83,24 +83,18 @@ void parse_config(void)
     char *directoryPathCopy;
     directoryPathCopy = malloc(sizeof(directoryPath) + strlen(include_json->valuestring) + 1);
     strcpy(directoryPathCopy, directoryPath);
-    printf("%s\n", include_json->valuestring);
     strcat(directoryPathCopy, include_json->valuestring);
 
     // Loop as long a we find an include directive in the included files
-    while (1)
-    {
-      printf("reading included config file\n");
+    while (1) {
       config_file = fopen(directoryPathCopy, "rb");
-      printf("opening: %s\n", directoryPathCopy);
       if (config_file == NULL)
       {
         printf("Can't read included file %s, make sure the file exists.\n", directoryPathCopy);
         exit(1);
       }
       // Read included config file
-      printf("ok all fine\n");
       fseek(config_file, 0, SEEK_END);
-      printf("ok sir\n");
       long file_size = ftell(config_file);
       rewind(config_file);
       char *included_config = (char *)malloc(file_size + 1);
@@ -126,9 +120,7 @@ void parse_config(void)
     free(directoryPathCopy);
   }
   free(config_file_path);
-  for (int i = 0; i < config_files.used; i++)
-  {
-    printf("%s\n", config_files.strings[i]);
+  for (int i = 0; i < config_files.used; i++) {
     json = cJSON_Parse(config_files.strings[i]);
     // Parse modules
     cJSON *modules_json = cJSON_GetObjectItemCaseSensitive(json, "modules");
@@ -158,7 +150,6 @@ void parse_config(void)
   }
 
   freePaths(&config_files);
-  printf("parsing done\n");
 }
 
 static void parse_modules(cJSON *modules_json)

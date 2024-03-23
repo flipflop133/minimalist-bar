@@ -180,9 +180,12 @@ static void parse_i3_workspaces(char *config)
     cJSON *num = cJSON_GetObjectItemCaseSensitive(workspace, "num");
     cJSON *visible = cJSON_GetObjectItemCaseSensitive(workspace, "visible");
     cJSON *urgent = cJSON_GetObjectItemCaseSensitive(workspace, "urgent");
+    cJSON *rect = cJSON_GetObjectItemCaseSensitive(workspace, "rect");
+    cJSON *x = cJSON_GetObjectItemCaseSensitive(rect, "x");
     workspaces.workspaces[i].num = num->valueint;
     workspaces.workspaces[i].visible = visible->valueint;
     workspaces.workspaces[i].urgent = urgent->valueint;
+    workspaces.workspaces[i].x = x->valueint;
     i++;
     if (i > workspaces_number)
     {

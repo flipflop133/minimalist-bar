@@ -6,6 +6,7 @@ typedef struct
   unsigned char num;
   unsigned char visible;
   unsigned char urgent;
+  unsigned int x;
 } Workspace;
 typedef struct
 {
