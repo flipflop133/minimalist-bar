@@ -1,5 +1,5 @@
 #include "i3ipc.h"
-#include "display.h"
+#include "display/display.h"
 #include <cjson/cJSON.h>
 #include <fcntl.h>
 #include <i3/ipc.h>

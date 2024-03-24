@@ -1,6 +1,6 @@
 #include "media.h"
 #include "../defs.h"
-#include "../display.h"
+#include "../display/display.h"
 #include <stdio.h>
 #include <stdlib.h>
 #define COMMAND_BUFFER 100

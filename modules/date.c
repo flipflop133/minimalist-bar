@@ -1,6 +1,6 @@
 #include "date.h"
 #include "../defs.h"
-#include "../display.h"
+#include "../display/display.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,7 +9,7 @@
 
 void *date_update(void *arg) {
   char previous_string[DATE_BUFFER] = "\0";
-  
+
   struct Module *module = (struct Module *)arg;
 
   while (running) {

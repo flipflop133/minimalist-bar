@@ -3,19 +3,22 @@ project(minimalist_bar)
 
 set(CMAKE_C_STANDARD 11)
 
-set(SRC_DIR modules)
+set(MODULES_DIR modules)
+set(DISPLAY_DIR display)
 
 set(SRC_FILES
     main.c
-    display.c
     i3ipc.c
     parser.c
-    ${SRC_DIR}/date.c
-    ${SRC_DIR}/battery.c
-    ${SRC_DIR}/network.c
-    ${SRC_DIR}/media.c
-    ${SRC_DIR}/bluetooth.c
-    ${SRC_DIR}/volume.c
+    ${MODULES_DIR}/date.c
+    ${MODULES_DIR}/battery.c
+    ${MODULES_DIR}/network.c
+    ${MODULES_DIR}/media.c
+    ${MODULES_DIR}/bluetooth.c
+    ${MODULES_DIR}/volume.c
+    ${DISPLAY_DIR}/display.c
+    ${DISPLAY_DIR}/modules.c
+    ${DISPLAY_DIR}/workspaces.c
 )
 
 add_executable(minimalist_bar ${SRC_FILES})

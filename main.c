@@ -1,5 +1,5 @@
 #include "defs.h"
-#include "display.h"
+#include "display/display.h"
 #include "i3ipc.h"
 #include "modules/battery.h"
 #include "modules/bluetooth.h"

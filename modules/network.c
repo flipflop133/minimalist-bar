@@ -1,5 +1,6 @@
 #include "network.h"
 #include "../defs.h"
+#include "../display/display.h"
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
 #include <linux/wireless.h>
@@ -10,7 +11,6 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include "../display.h"
 void determine_wifi_status(unsigned int flags, int interface_type, struct Module *module);
 static void retrieve_initial_status(int interface_type, struct Module *module);
 static char *convert_signal_to_icon(int signal);
@@ -39,7 +39,7 @@ static int execute_ioctl_command(int command, char *result, struct Module *modul
   if (command == SIOCGIWESSID) {
     wreq.u.essid.pointer = malloc(IW_ESSID_MAX_SIZE + 1);
     wreq.u.essid.length = IW_ESSID_MAX_SIZE + 1;
-    
+
     if(ioctl(sockfd, command, &wreq) == -1) {
       return 1;
     }
@@ -134,7 +134,7 @@ void determine_wifi_status(unsigned int flags, int interface_type, struct Module
     else{
       strcpy(module->string, "󰈁 ");
     }
-    
+
   } else {
     if(interface_type == WIFI){
       strcpy(module->string, "󰖪 ");

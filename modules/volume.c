@@ -1,6 +1,6 @@
 #include "volume.h"
 #include "../defs.h"
-#include "../display.h"
+#include "../display/display.h"
 #include <pulse/pulseaudio.h>
 #include <stdio.h>
 #include <string.h>

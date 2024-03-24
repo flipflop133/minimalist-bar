@@ -1,6 +1,6 @@
 #include "bluetooth.h"
 #include "../defs.h"
-#include "../display.h"
+#include "../display/display.h"
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
