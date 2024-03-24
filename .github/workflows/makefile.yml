@@ -16,7 +16,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libpulse-dev libx11-dev libxft-dev libcjson-dev libbluetooth-dev libfreetype6-dev i3-wm libxrandr-dev xserver-xorg-dev
+        sudo apt-get install -y libpulse-dev libx11-dev libxft-dev libcjson-dev libbluetooth-dev libfreetype6-dev i3-wm libxrandr-dev xserver-xorg-dev libxinerama-dev
        
     - name: make
       run: ./build.sh
