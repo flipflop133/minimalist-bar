@@ -3,13 +3,13 @@ project(minimalist_bar)
 
 set(CMAKE_C_STANDARD 11)
 
-set(MODULES_DIR modules)
-set(DISPLAY_DIR display)
+set(MODULES_DIR src/modules)
+set(DISPLAY_DIR src/display)
 
 set(SRC_FILES
-    main.c
-    i3ipc.c
-    parser.c
+    src/main.c
+    src/i3ipc.c
+    src/parser.c
     ${MODULES_DIR}/date.c
     ${MODULES_DIR}/battery.c
     ${MODULES_DIR}/network.c
