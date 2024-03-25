@@ -1,7 +1,6 @@
 #include "volume.h"
 #include "../defs.h"
 #include "../display/display.h"
-#include <pulse/pulseaudio.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -105,7 +104,6 @@ static void source_info_callback(pa_context *, const pa_source_info *i, int,
 void *volume_update(void *arg) {
   struct Module *module = (struct Module *)arg;
   volume_module = module;
-
   pulse_loop(SINK, volume_loop);
   free(module->string);
   return NULL;
@@ -114,9 +112,6 @@ void *volume_update(void *arg) {
 void *mic_update(void *arg) {
   struct Module *module = (struct Module *)arg;
   mic_module = module;
-  pthread_mutex_lock(&mutex);
-  module->string = (char *)malloc((MIC_BUFFER * sizeof(char)));
-  pthread_mutex_unlock(&mutex);
   pulse_loop(SOURCE, mic_loop);
   free(module->string);
   return NULL;

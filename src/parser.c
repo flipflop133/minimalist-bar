@@ -191,7 +191,7 @@ static void parse_modules(cJSON *modules_json)
       current->Module_infos = options;
       current->thread_function = date_update;
       strcpy(current->name, "date");
-      current->string = malloc((DATE_BUFFER));
+      current->string = (char *)malloc((DATE_BUFFER * sizeof(char)));
       strcpy(current->string, "\0");
     }
 
@@ -207,7 +207,7 @@ static void parse_modules(cJSON *modules_json)
       strcpy(options->battery, battery);
       current->Module_infos = options;
       strcpy(current->name, "battery");
-      current->string = malloc((BATTERY_BUFFER));
+      current->string = (char *)malloc((BATTERY_BUFFER * sizeof(char)));
       strcpy(current->string, "\0");
     }
 
