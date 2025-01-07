@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
   parse_config();
   signal(SIGTERM, cleanup);
   signal(SIGINT, cleanup);
+  signal(SIGHUP, cleanup);
 
   // Start display thread
   pthread_t display_thread;
