@@ -2,8 +2,6 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include "../defs.h"
-#include "../i3ipc.h"
 #include <X11/Xft/Xft.h>
 #include <X11/extensions/Xinerama.h>
 

@@ -18,6 +18,10 @@ cd "$BUILD_DIR" || exit 1
 
 echo "Build type: $BUILD_TYPE"
 
+# Set the compiler to Clang
+export CC=clang
+export CXX=clang++
+
 # Run CMake with the specified build type
 cmake -DCMAKE_BUILD_TYPE="$BUILD_TYPE" ..
 

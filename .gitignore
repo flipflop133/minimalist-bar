@@ -15,3 +15,5 @@
 
 # Ignore CMAKE build directory
 build/
+
+.cache/

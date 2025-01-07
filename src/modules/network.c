@@ -32,7 +32,8 @@ static int isWiFiInterface(const char *ifname) {
 
 static int execute_ioctl_command(int command, char *result, struct Module *module) {
   struct iwreq wreq;
-  sprintf(wreq.ifr_ifrn.ifrn_name, ((struct Network*)(module->Module_infos))->interface);
+  sprintf(wreq.ifr_ifrn.ifrn_name, "%s",
+          ((struct Network *)(module->Module_infos))->interface);
   int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
   // Retrieve the SSID

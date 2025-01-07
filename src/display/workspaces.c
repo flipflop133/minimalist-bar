@@ -1,3 +1,5 @@
+#include "../defs.h"
+#include "../i3ipc.h"
 #include "display.h"
 
 /**

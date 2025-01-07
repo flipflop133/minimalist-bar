@@ -1,0 +1,74 @@
+[
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/main.c.o -c /home/francois/minimalist-bar/src/main.c",
+  "file": "/home/francois/minimalist-bar/src/main.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/main.c.o"
+},
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/i3ipc.c.o -c /home/francois/minimalist-bar/src/i3ipc.c",
+  "file": "/home/francois/minimalist-bar/src/i3ipc.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/i3ipc.c.o"
+},
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/parser.c.o -c /home/francois/minimalist-bar/src/parser.c",
+  "file": "/home/francois/minimalist-bar/src/parser.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/parser.c.o"
+},
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/modules/date.c.o -c /home/francois/minimalist-bar/src/modules/date.c",
+  "file": "/home/francois/minimalist-bar/src/modules/date.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/modules/date.c.o"
+},
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/modules/battery.c.o -c /home/francois/minimalist-bar/src/modules/battery.c",
+  "file": "/home/francois/minimalist-bar/src/modules/battery.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/modules/battery.c.o"
+},
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/modules/network.c.o -c /home/francois/minimalist-bar/src/modules/network.c",
+  "file": "/home/francois/minimalist-bar/src/modules/network.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/modules/network.c.o"
+},
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/modules/media.c.o -c /home/francois/minimalist-bar/src/modules/media.c",
+  "file": "/home/francois/minimalist-bar/src/modules/media.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/modules/media.c.o"
+},
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/modules/bluetooth.c.o -c /home/francois/minimalist-bar/src/modules/bluetooth.c",
+  "file": "/home/francois/minimalist-bar/src/modules/bluetooth.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/modules/bluetooth.c.o"
+},
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/modules/volume.c.o -c /home/francois/minimalist-bar/src/modules/volume.c",
+  "file": "/home/francois/minimalist-bar/src/modules/volume.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/modules/volume.c.o"
+},
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/display/display.c.o -c /home/francois/minimalist-bar/src/display/display.c",
+  "file": "/home/francois/minimalist-bar/src/display/display.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/display/display.c.o"
+},
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/display/modules.c.o -c /home/francois/minimalist-bar/src/display/modules.c",
+  "file": "/home/francois/minimalist-bar/src/display/modules.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/display/modules.c.o"
+},
+{
+  "directory": "/home/francois/minimalist-bar/build",
+  "command": "/usr/bin/gcc -I/usr/include/freetype2 -O3 -DNDEBUG -std=c2x -O3 -flto -g -Wall -Wextra -o CMakeFiles/minimalist_bar.dir/src/display/workspaces.c.o -c /home/francois/minimalist-bar/src/display/workspaces.c",
+  "file": "/home/francois/minimalist-bar/src/display/workspaces.c",
+  "output": "CMakeFiles/minimalist_bar.dir/src/display/workspaces.c.o"
+}
+]

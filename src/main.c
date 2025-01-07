@@ -3,9 +3,7 @@
 #include "i3ipc.h"
 #include "modules/battery.h"
 #include "modules/bluetooth.h"
-#include "modules/date.h"
 #include "modules/media.h"
-#include "modules/network.h"
 #include "modules/volume.h"
 #include "parser.h"
 #include <pulse/pulseaudio.h>
